@@ -488,9 +488,10 @@
             const url = result.assetUrl || result.downloadUrl;
             const name = result.assetName || ('HT-Proxy-' + result.version + '-Setup.exe');
 
-            if (!url || (!url.includes('github.com') && !url.includes('githubusercontent.com'))) {
+            if (!url) {
+              // Không có file .exe trong release — hiện thông báo
               errorDiv.classList.remove('hidden');
-              errorText.textContent = 'Không tìm thấy file cài đặt trong bản release.';
+              errorText.textContent = 'Bản cập nhật chưa có file cài đặt. Vui lòng thử lại sau.';
               return;
             }
 

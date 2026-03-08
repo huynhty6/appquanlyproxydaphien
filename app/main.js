@@ -159,10 +159,11 @@ ipcMain.handle('check-for-update', async () => {
         hasUpdate: true,
         version: latestVersion,
         body: data.body || '',
-        downloadUrl: exeAsset ? exeAsset.browser_download_url : data.html_url,
-        assetUrl: exeAsset ? exeAsset.url : null, // API URL for authenticated download
+        downloadUrl: exeAsset ? exeAsset.browser_download_url : null,
+        assetUrl: exeAsset ? exeAsset.url : null,
         assetName: exeAsset ? exeAsset.name : null,
         assetSize: exeAsset ? exeAsset.size : 0,
+        releaseUrl: data.html_url, // fallback link for manual download
       };
     }
     return { hasUpdate: false };
