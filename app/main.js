@@ -181,23 +181,23 @@ ipcMain.handle('open-download-link', (event, url) => {
 // ─── Download update .exe from GitHub Release asset ──────────────────────────
 let downloadedInstallerPath = null;
 
-ipcMain.handle('download-update', async (event, assetUrl, assetName) => {
+ipcMain.handle('download-update', async (event, downloadUrl, assetName) => {
   const GITHUB_TOKEN = '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';
   const destPath = path.join(os.tmpdir(), assetName || 'HT-Proxy-Setup.exe');
+  const isApiUrl = downloadUrl.includes('api.github.com');
 
   return new Promise((resolve, reject) => {
-    const req = net.request(assetUrl);
+    const req = net.request({ url: downloadUrl, redirect: 'manual' });
     req.setHeader('User-Agent', 'HT-Proxy-Desktop');
     req.setHeader('Authorization', `token ${GITHUB_TOKEN}`);
-    req.setHeader('Accept', 'application/octet-stream');
+    if (isApiUrl) req.setHeader('Accept', 'application/octet-stream');
 
     req.on('response', (response) => {
-      // GitHub API redirects to S3 for asset download
+      // GitHub redirects to S3 for asset download — follow without auth
       if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location) {
         const redirectUrl = Array.isArray(response.headers.location)
           ? response.headers.location[0]
           : response.headers.location;
-        // Follow redirect without auth header
         const req2 = net.request(redirectUrl);
         req2.setHeader('User-Agent', 'HT-Proxy-Desktop');
         req2.on('response', (res2) => {

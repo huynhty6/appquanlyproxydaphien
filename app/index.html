@@ -484,9 +484,13 @@
           });
 
           btnDownload.onclick = async () => {
-            if (!result.assetUrl) {
-              // Fallback: open browser if no asset URL
-              window.htUpdate.openDownloadLink(result.downloadUrl);
+            // Ưu tiên assetUrl (API), fallback downloadUrl (browser_download_url)
+            const url = result.assetUrl || result.downloadUrl;
+            const name = result.assetName || ('HT-Proxy-' + result.version + '-Setup.exe');
+
+            if (!url || (!url.includes('github.com') && !url.includes('githubusercontent.com'))) {
+              errorDiv.classList.remove('hidden');
+              errorText.textContent = 'Không tìm thấy file cài đặt trong bản release.';
               return;
             }
 
@@ -499,7 +503,7 @@
             progressLabel.textContent = 'Đang tải bản cập nhật...';
 
             try {
-              await window.htUpdate.downloadUpdate(result.assetUrl, result.assetName);
+              await window.htUpdate.downloadUpdate(url, name);
               // Download complete
               progressLabel.textContent = 'Tải hoàn tất!';
               progressBar.style.width = '100%';
