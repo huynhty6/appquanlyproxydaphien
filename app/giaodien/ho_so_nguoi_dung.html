@@ -1,0 +1,408 @@
+<!DOCTYPE html><html class="light" lang="vi"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: { "primary": "#1349ec", "background-light": "#f6f6f8", "background-dark": "#101522" },
+      fontFamily: { "display": ["Inter"] },
+      borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+    },
+  },
+}
+</script>
+<title>Hồ sơ người dùng - HT Proxy</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<script>if(location.search.includes('embed=1')){document.write('<style>aside{display:none!important}.max-w-5xl,.max-w-6xl,.max-w-7xl{max-width:100%!important}</style>');}</script>
+<div class="flex h-full min-h-screen overflow-hidden">
+<aside class="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark flex flex-col">
+<div class="p-6 flex items-center gap-3">
+<div class="size-10 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-2xl">shield_person</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-lg font-bold leading-tight tracking-tight">HT Proxy</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium">v2.6.0 Professional</p>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto px-4 py-2 space-y-1">
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">dashboard</span><span class="text-sm font-medium">Bảng điều khiển</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">list_alt</span><span class="text-sm font-medium">Cài Đặt</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">history</span><span class="text-sm font-medium">Lịch sử xoay IP</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">description</span><span class="text-sm font-medium">Nhật ký</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">person_add</span><span class="text-sm font-medium">Gán Proxy</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">verified_user</span><span class="text-sm font-medium">Kiểm tra Proxy</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary text-white"><span class="material-symbols-outlined text-[22px]">settings</span><span class="text-sm font-semibold">Hồ Sơ</span></div>
+<div class="pt-4 pb-2"><p class="px-3 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Hỗ trợ &amp; Tài liệu</p></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">mail</span><span class="text-sm font-medium">Liên hệ</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">info</span><span class="text-sm font-medium">Giới thiệu</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">menu_book</span><span class="text-sm font-medium">Hướng dẫn</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">code</span><span class="text-sm font-medium">API</span></div>
+</nav>
+<div class="p-4 mt-auto">
+<button class="w-full py-2.5 bg-primary/10 dark:bg-primary/20 text-primary rounded-lg text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined text-lg">upgrade</span><span>Nâng cấp Gói</span>
+</button>
+</div>
+</aside>
+
+<main class="flex-1 overflow-y-auto">
+<header class="h-16 flex-shrink-0 bg-white dark:bg-background-dark border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
+<div class="flex items-center gap-4 flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl leading-none">search</span>
+<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary/50 text-slate-900 dark:text-slate-100 placeholder:text-slate-500" placeholder="Tìm kiếm..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-symbols-outlined text-xl block dark:hidden">dark_mode</span>
+<span class="material-symbols-outlined text-xl hidden dark:block">light_mode</span>
+</button>
+<button class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors relative">
+<span class="material-symbols-outlined text-xl">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-background-dark"></span>
+</button>
+<div class="h-8 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<div class="flex items-center gap-3 cursor-pointer group">
+<div class="text-right hidden sm:block">
+<p id="header-name" class="text-sm font-bold">...</p>
+<p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Người dùng</p>
+</div>
+<div class="size-9 rounded-full bg-primary/20 overflow-hidden border-2 border-transparent group-hover:border-primary transition-all flex items-center justify-center">
+<img src="../logouser.png" alt="Avatar" class="w-full h-full object-cover">
+</div>
+</div>
+<button onclick="doLogout()" class="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors" title="Đăng xuất">
+<span class="material-symbols-outlined text-xl">logout</span>
+</button>
+</div>
+</header>
+
+<!-- Toast -->
+<div id="toast" class="fixed top-6 right-6 z-[9999] hidden">
+<div id="toast-inner" class="flex items-start gap-3 px-5 py-4 rounded-xl shadow-2xl border max-w-sm">
+<span id="toast-icon" class="material-symbols-outlined text-xl mt-0.5"></span>
+<div><p id="toast-title" class="text-sm font-bold"></p><p id="toast-msg" class="text-xs mt-0.5 opacity-80"></p></div>
+</div>
+</div>
+
+<div class="p-8 max-w-6xl mx-auto flex flex-col gap-8">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h2 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Hồ sơ người dùng</h2>
+<p class="text-slate-500 dark:text-slate-400 mt-1">Quản lý thông tin cá nhân và cài đặt bảo mật của bạn.</p>
+</div>
+<button onclick="saveProfile()" class="bg-primary text-white px-5 py-2.5 rounded-lg font-bold text-sm flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform active:scale-95">
+<span class="material-symbols-outlined text-lg">save</span>Lưu Thay Đổi
+</button>
+</div>
+
+<div class="grid grid-cols-1 gap-8">
+<!-- Personal Info Card -->
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+<div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
+<h4 class="font-bold">Thông tin cá nhân</h4>
+</div>
+<div class="p-8 flex flex-col md:flex-row gap-10">
+<div class="flex flex-col items-center gap-4">
+<div class="relative">
+<div class="size-32 rounded-full bg-primary/10 border-4 border-slate-100 dark:border-slate-800 overflow-hidden flex items-center justify-center">
+<img src="../logouser.png" alt="Avatar" class="w-full h-full object-cover">
+</div>
+</div>
+<p class="text-xs text-slate-500 text-center max-w-[150px]">Ảnh đại diện</p>
+</div>
+<div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-1.5">
+<label class="text-sm font-bold text-slate-700 dark:text-slate-300">Họ và tên</label>
+<input id="inp-name" class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm" type="text">
+</div>
+<div class="space-y-1.5">
+<label class="text-sm font-bold text-slate-700 dark:text-slate-300">Email</label>
+<input id="inp-email" class="w-full bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm text-slate-500" disabled type="email">
+</div>
+<div class="space-y-1.5">
+<label class="text-sm font-bold text-slate-700 dark:text-slate-300">Số điện thoại</label>
+<input id="inp-phone" class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm" type="tel" placeholder="Nhập số điện thoại">
+</div>
+<div class="space-y-1.5">
+<label class="text-sm font-bold text-slate-700 dark:text-slate-300">Quốc gia</label>
+<select id="inp-country" class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm">
+<option value="">Chọn quốc gia</option>
+<option value="Việt Nam">Việt Nam</option>
+<option value="Hoa Kỳ">Hoa Kỳ</option>
+<option value="Singapore">Singapore</option>
+<option value="Nhật Bản">Nhật Bản</option>
+<option value="Hàn Quốc">Hàn Quốc</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- License Key Card -->
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm flex flex-col">
+<div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
+<h4 class="font-bold">Quản lý License Key</h4>
+</div>
+<div class="p-6 space-y-6">
+<div class="bg-primary/5 border border-primary/20 rounded-xl p-4 flex items-center justify-between">
+<div class="space-y-1">
+<p class="text-[10px] font-black text-primary uppercase tracking-widest">Key hiện tại</p>
+<p id="license-current" class="font-mono font-bold text-sm">Chưa kích hoạt</p>
+</div>
+<button onclick="copyLicenseKey()" class="p-2 hover:bg-primary/10 rounded-lg text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">content_copy</span>
+</button>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-sm font-bold">
+<span class="text-slate-500">Trạng thái</span>
+<span id="license-status" class="text-slate-400">Chưa kích hoạt</span>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold">Kích hoạt Key mới</label>
+<div class="flex gap-2">
+<input id="inp-license" class="flex-1 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-sm" placeholder="Nhập mã của bạn..." type="text">
+<button onclick="activateLicense()" class="bg-slate-900 dark:bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-800 transition-colors">Kích hoạt</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Login History Card -->
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm flex flex-col">
+<div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 flex items-center justify-between">
+<h4 class="font-bold">Lịch sử đăng nhập</h4>
+<button onclick="loadLoginHistory()" class="text-xs font-bold text-primary hover:underline">Tải lại</button>
+</div>
+<div class="flex-1 overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
+<th class="px-4 py-3">Thiết bị</th>
+<th class="px-4 py-3">IP</th>
+<th class="px-4 py-3">Vị trí</th>
+<th class="px-4 py-3">Thời gian</th>
+<th class="px-4 py-3">Trạng thái</th>
+</tr>
+</thead>
+<tbody id="login-history-body" class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr><td colspan="5" class="px-6 py-8 text-center text-sm text-slate-400">Đang tải...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- Contact Support Card -->
+<div class="bg-primary rounded-xl p-6 text-white flex items-center justify-between shadow-lg shadow-primary/20">
+<div class="flex items-center gap-4">
+<div class="size-12 bg-white/20 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">support_agent</span>
+</div>
+<div>
+<h5 class="font-bold">Bạn cần hỗ trợ kỹ thuật?</h5>
+<p class="text-white/80 text-sm">Đội ngũ hỗ trợ của chúng tôi luôn sẵn sàng 24/7.</p>
+</div>
+</div>
+<button class="bg-white text-primary px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-slate-100 transition-colors">Liên hệ ngay</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+let auth = null, db = null;
+try {
+  const app = firebase.initializeApp(FIREBASE_CONFIG);
+  auth = firebase.auth(app);
+  db = firebase.firestore(app);
+} catch (e) { console.warn('Firebase init:', e); }
+
+let _toastTimer = null;
+function showToast(type, title, msg) {
+  clearTimeout(_toastTimer);
+  const toast = document.getElementById('toast');
+  const inner = document.getElementById('toast-inner');
+  const icon = document.getElementById('toast-icon');
+  document.getElementById('toast-title').textContent = title;
+  document.getElementById('toast-msg').textContent = msg;
+  inner.className = 'flex items-start gap-3 px-5 py-4 rounded-xl shadow-2xl border max-w-sm ';
+  if (type === 'success') { inner.className += 'bg-emerald-50 border-emerald-200 text-emerald-800'; icon.textContent = 'check_circle'; }
+  else if (type === 'error') { inner.className += 'bg-red-50 border-red-200 text-red-800'; icon.textContent = 'error'; }
+  else { inner.className += 'bg-amber-50 border-amber-200 text-amber-800'; icon.textContent = 'warning'; }
+  toast.classList.remove('hidden');
+  _toastTimer = setTimeout(() => toast.classList.add('hidden'), 3500);
+}
+function enc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function shortDevice(ua) {
+  if (!ua) return 'Desktop';
+  if (ua.includes('Electron')) return 'HT Proxy Desktop';
+  if (ua.includes('Chrome') && !ua.includes('Edg')) return 'Chrome';
+  if (ua.includes('Edg')) return 'Edge';
+  if (ua.includes('Firefox')) return 'Firefox';
+  if (ua.includes('Safari') && !ua.includes('Chrome')) return 'Safari';
+  return ua.length > 30 ? ua.substring(0, 30) + '...' : ua;
+}
+
+async function loadProfile() {
+  const user = auth?.currentUser;
+  if (!user || !db) { window.location.href = 'dang_nhap.html'; return; }
+  try {
+    const snap = await db.collection('users').doc(user.uid).get();
+    const u = snap.exists ? snap.data() : {};
+    document.getElementById('inp-name').value = u.full_name || '';
+    document.getElementById('inp-email').value = u.email || user.email || '';
+    document.getElementById('inp-phone').value = u.phone || '';
+    document.getElementById('inp-country').value = u.country || '';
+    document.getElementById('header-name').textContent = u.full_name || user.email || 'User';
+    const hasKey = !!(u.license_key && u.license_key.trim());
+    const expired = u.license_expires && new Date(u.license_expires) <= new Date();
+    let keyValid = false;
+    if (hasKey) {
+      try {
+        const ks = await db.collection('license_keys').where('key', '==', u.license_key).limit(1).get();
+        if (!ks.empty) {
+          const kd = ks.docs[0].data();
+          const kExp = kd.expires_at ? (kd.expires_at.toDate ? kd.expires_at.toDate() : new Date(kd.expires_at)) : null;
+          keyValid = !kExp || kExp > new Date();
+        } else {
+          db.collection('users').doc(user.uid).update({ license_key: '', license_expires: null }).catch(() => {});
+        }
+      } catch (_) { keyValid = !expired; }
+    }
+    if (hasKey && keyValid) {
+      document.getElementById('license-current').textContent = u.license_key;
+      document.getElementById('license-status').textContent = 'Đã kích hoạt';
+      document.getElementById('license-status').className = 'text-primary font-bold';
+    } else if (hasKey && expired) {
+      document.getElementById('license-current').textContent = u.license_key;
+      document.getElementById('license-status').textContent = 'Hết hạn';
+      document.getElementById('license-status').className = 'text-red-500 font-bold';
+    } else if (hasKey && !keyValid) {
+      document.getElementById('license-current').textContent = 'Key đã bị thu hồi';
+      document.getElementById('license-status').textContent = 'Không hợp lệ';
+      document.getElementById('license-status').className = 'text-red-500 font-bold';
+    } else {
+      document.getElementById('license-current').textContent = 'Chưa kích hoạt';
+      document.getElementById('license-status').textContent = 'Chưa kích hoạt';
+      document.getElementById('license-status').className = 'text-slate-400';
+    }
+  } catch (e) { showToast('error', 'Lỗi', e.message); }
+}
+
+async function saveProfile() {
+  const user = auth?.currentUser;
+  if (!user || !db) return;
+  try {
+    await db.collection('users').doc(user.uid).update({
+      full_name: document.getElementById('inp-name').value.trim(),
+      phone: document.getElementById('inp-phone').value.trim(),
+      country: document.getElementById('inp-country').value,
+    });
+    showToast('success', 'Đã lưu', 'Hồ sơ đã được cập nhật');
+    const newName = document.getElementById('inp-name').value.trim();
+    if (newName) {
+      localStorage.setItem('ht_user_name', newName);
+      try { if (window.parent && window.parent !== window) window.parent._userName = newName; } catch(_) {}
+    }
+    loadProfile();
+  } catch (e) { showToast('error', 'Lỗi', e.message); }
+}
+
+async function activateLicense() {
+  const key = document.getElementById('inp-license').value.trim();
+  if (!key) { showToast('warn', 'Thiếu key', 'Nhập mã license'); return; }
+  const user = auth?.currentUser;
+  if (!user || !db) return;
+  try {
+    const snap = await db.collection('license_keys').where('key', '==', key).limit(1).get();
+    if (snap.empty) { showToast('error', 'Key không hợp lệ', 'Mã license không tồn tại hoặc đã hết hạn'); return; }
+    const doc = snap.docs[0];
+    const d = doc.data();
+    if (d.is_used && d.user_id !== user.uid) { showToast('error', 'Key đã dùng', 'Mã này đã được kích hoạt bởi tài khoản khác'); return; }
+    const exp = d.expires_at ? d.expires_at.toDate ? d.expires_at.toDate() : new Date(d.expires_at) : null;
+    if (exp && exp < new Date()) { showToast('error', 'Key hết hạn', 'Mã license đã hết hạn'); return; }
+    const tier = (d.tier || 'personal').toLowerCase();
+    const batch = db.batch();
+    batch.update(doc.ref, { user_id: user.uid, is_used: true, used_at: new Date().toISOString() });
+    batch.update(db.collection('users').doc(user.uid), {
+      license_key: key,
+      license_expires: exp ? exp.toISOString() : null,
+      license_tier: ['personal','business','test'].includes(tier) ? tier : 'personal',
+    });
+    await batch.commit();
+    showToast('success', 'Kích hoạt thành công', 'License key đã được kích hoạt');
+    document.getElementById('inp-license').value = '';
+    loadProfile();
+    if (window.parent && window.parent !== window) window.parent.postMessage('ht_license_activated', '*');
+  } catch (e) { showToast('error', 'Lỗi', e.message); }
+}
+
+function copyLicenseKey() {
+  const key = document.getElementById('license-current').textContent;
+  if (!key || key === 'Chưa kích hoạt') return;
+  navigator.clipboard.writeText(key).then(() => showToast('success', 'Đã copy', key));
+}
+
+async function loadLoginHistory() {
+  const user = auth?.currentUser;
+  if (!user || !db) return;
+  try {
+    const snap = await db.collection('login_history').where('user_id', '==', user.uid).orderBy('login_at', 'desc').limit(10).get();
+    const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const tbody = document.getElementById('login-history-body');
+    if (list.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-sm text-slate-400">Chưa có lịch sử</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(h => {
+      const t = h.login_at && (h.login_at.toDate ? h.login_at.toDate() : new Date(h.login_at));
+      const time = t ? t.toLocaleString('vi-VN') : '';
+      const loc = h.location || '';
+      return '<tr class="text-sm">' +
+        '<td class="px-4 py-3 font-bold whitespace-nowrap">' + enc(shortDevice(h.device)) + '</td>' +
+        '<td class="px-4 py-3 text-slate-500 font-mono text-xs">' + enc(h.ip_address || '—') + '</td>' +
+        '<td class="px-4 py-3 text-slate-500 text-xs max-w-[180px] truncate" title="' + enc(loc || '') + '">' + enc(loc || '—') + '</td>' +
+        '<td class="px-4 py-3 text-slate-500 whitespace-nowrap">' + enc(time) + '</td>' +
+        '<td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase ' +
+        (h.status === 'success' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600') +
+        '">' + enc(h.status === 'success' ? 'Thành công' : 'Thất bại') + '</span></td></tr>';
+    }).join('');
+  } catch (e) { showToast('error', 'Lỗi', e.message); }
+}
+
+function doLogout() {
+  auth?.signOut();
+  localStorage.removeItem('ht_token');
+  localStorage.removeItem('ht_user_id');
+  localStorage.removeItem('ht_remember');
+  window.location.href = 'dang_nhap.html';
+}
+
+auth?.onAuthStateChanged(function(u) {
+  if (!u) { window.location.href = 'dang_nhap.html'; return; }
+  loadProfile();
+  loadLoginHistory();
+});
+</script>
+</body></html>

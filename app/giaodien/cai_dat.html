@@ -1,0 +1,455 @@
+<!DOCTYPE html><html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cài đặt - HT Proxy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: { "primary": "#1349ec", "background-light": "#f6f6f8", "background-dark": "#101522" },
+      fontFamily: { "display": ["Inter"] },
+      borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+    },
+  },
+}
+</script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<script>if(location.search.includes('embed=1')){document.write('<style>aside{display:none!important}.max-w-5xl,.max-w-6xl,.max-w-7xl{max-width:100%!important}</style>');}</script>
+<div class="flex h-screen overflow-hidden">
+<aside class="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark flex flex-col">
+<div class="p-6 flex items-center gap-3">
+<div class="size-10 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-2xl">shield_person</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-lg font-bold leading-tight tracking-tight">HT Proxy</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium">v2.6.0 Professional</p>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto px-4 py-2 space-y-1">
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">dashboard</span><span class="text-sm font-medium">Bảng điều khiển</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary text-white shadow-sm"><span class="material-symbols-outlined text-[22px]">settings</span><span class="text-sm font-semibold">Cài đặt</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">history</span><span class="text-sm font-medium">Lịch sử xoay</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">description</span><span class="text-sm font-medium">Nhật ký</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">person_add</span><span class="text-sm font-medium">Gán Proxy</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">verified_user</span><span class="text-sm font-medium">Kiểm tra Proxy</span></div>
+<div class="pt-4 pb-2"><p class="px-3 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Hỗ trợ &amp; Tài liệu</p></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">mail</span><span class="text-sm font-medium">Liên hệ</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">info</span><span class="text-sm font-medium">Giới thiệu</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">menu_book</span><span class="text-sm font-medium">Hướng dẫn</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">code</span><span class="text-sm font-medium">API</span></div>
+</nav>
+<div class="p-4 mt-auto">
+<button class="w-full py-2.5 bg-primary/10 dark:bg-primary/20 text-primary rounded-lg text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined text-lg">upgrade</span><span>Nâng cấp Gói</span>
+</button>
+</div>
+</aside>
+<main class="flex-1 flex flex-col overflow-hidden">
+<header class="h-16 flex-shrink-0 bg-white dark:bg-background-dark border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
+<h2 class="text-lg font-bold">Cấu hình hệ thống</h2>
+<div class="flex items-center gap-3">
+<button class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-symbols-outlined text-xl block dark:hidden">dark_mode</span>
+<span class="material-symbols-outlined text-xl hidden dark:block">light_mode</span>
+</button>
+<div class="h-8 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<div class="flex items-center gap-2.5 cursor-pointer group" onclick="window.parent?.postMessage('ht_go_profile','*')">
+<div class="text-right hidden sm:block"><p id="header-user-name" class="text-sm font-bold truncate max-w-[120px]">...</p><p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Người dùng</p></div>
+<div class="size-9 rounded-full bg-primary/20 overflow-hidden border-2 border-transparent group-hover:border-primary transition-all"><img src="../logouser.png" alt="Avatar" class="w-full h-full object-cover"></div>
+</div>
+<button onclick="window.parent?.document.getElementById('btn-logout')?.click()" class="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors" title="Đăng xuất"><span class="material-symbols-outlined text-xl">logout</span></button>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-8 max-w-5xl mx-auto w-full space-y-8">
+
+<div id="confirm-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/40 backdrop-blur-sm" style="display:none">
+<div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-md mx-4 overflow-hidden animate-[scaleIn_0.2s_ease-out]">
+<div class="p-6 flex flex-col items-center text-center">
+<div id="confirm-icon-wrap" class="size-14 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-4">
+<span id="confirm-icon" class="material-symbols-outlined text-3xl text-amber-500">warning</span>
+</div>
+<h3 id="confirm-title" class="text-lg font-bold text-slate-900 dark:text-white mb-1">Xác nhận</h3>
+<p id="confirm-msg" class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed"></p>
+</div>
+<div class="flex border-t border-slate-200 dark:border-slate-800">
+<button id="confirm-cancel" class="flex-1 py-3.5 text-sm font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Hủy</button>
+<button id="confirm-ok" class="flex-1 py-3.5 text-sm font-bold text-white bg-primary hover:bg-primary/90 transition-colors">Xác nhận</button>
+</div>
+</div>
+</div>
+<style>@keyframes scaleIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}</style>
+
+<div id="toast" class="fixed top-6 right-6 z-[9999] translate-x-[120%] transition-transform duration-300 ease-out">
+<div id="toast-inner" class="flex items-start gap-3 px-5 py-4 rounded-xl shadow-2xl border max-w-sm relative overflow-hidden">
+<span id="toast-icon" class="material-symbols-outlined text-xl mt-0.5"></span>
+<div class="flex-1 min-w-0"><p id="toast-title" class="text-sm font-bold"></p><p id="toast-msg" class="text-xs mt-0.5 opacity-80 break-words"></p></div>
+<button onclick="hideToast()" class="ml-2 opacity-50 hover:opacity-100 transition-opacity"><span class="material-symbols-outlined text-base">close</span></button>
+<div id="toast-progress" class="absolute bottom-0 left-0 h-0.5 bg-current opacity-30 transition-all ease-linear" style="width:100%"></div>
+</div>
+</div>
+
+<section>
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary">settings_ethernet</span>
+<h3 class="text-xl font-bold">Cổng mạng Ethernet</h3>
+<button onclick="loadEthernet()" class="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-xs font-bold rounded-lg hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined text-base">refresh</span> Tải lại
+</button>
+</div>
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="text-xs font-bold text-slate-400 uppercase tracking-wider bg-slate-50 dark:bg-slate-800/50">
+<th class="px-5 py-3">Cổng</th>
+<th class="px-5 py-3">Trạng thái</th>
+<th class="px-5 py-3">Tốc độ</th>
+<th class="px-5 py-3">MAC Address</th>
+</tr>
+</thead>
+<tbody id="eth-tbody" class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr><td colspan="4" class="px-5 py-8 text-center text-slate-400 text-sm">Nhấn "Tải lại" để kiểm tra cổng mạng</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section>
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-violet-500">lan</span>
+<h3 class="text-xl font-bold">Mac Address Proxy</h3>
+<button onclick="loadMacvlan()" class="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-xs font-bold rounded-lg hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined text-base">refresh</span> Tải lại
+</button>
+</div>
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+<div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 flex flex-wrap items-center gap-3">
+<div class="flex items-center gap-2">
+<label class="text-xs font-bold text-slate-500">Ethernet gốc</label>
+<select id="mv-ether" class="text-xs border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 px-3 py-1.5"></select>
+</div>
+<div class="flex items-center gap-2">
+<label class="text-xs font-bold text-slate-500">Số lượng</label>
+<input id="mv-count" type="number" min="2" max="100" value="6" class="text-xs border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 px-3 py-1.5 w-20"/>
+</div>
+<button onclick="doRecreateMacvlan()" class="flex items-center gap-1.5 h-8 px-4 bg-rose-50 text-rose-600 border border-rose-200 text-xs font-bold rounded-lg hover:bg-rose-100 transition-all">
+<span class="material-symbols-outlined text-base">autorenew</span> Xóa &amp; Tạo mới
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="text-xs font-bold text-slate-400 uppercase tracking-wider bg-slate-50 dark:bg-slate-800/50">
+<th class="px-5 py-3">STT</th>
+<th class="px-5 py-3">Ethernet</th>
+<th class="px-5 py-3">MAC Address</th>
+<th class="px-5 py-3">Mode</th>
+<th class="px-5 py-3">Trạng thái</th>
+</tr>
+</thead>
+<tbody id="mv-tbody" class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr><td colspan="5" class="px-5 py-8 text-center text-slate-400 text-sm">Nhấn "Tải lại" để xem danh sách</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section>
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-amber-500">key</span>
+<h3 class="text-xl font-bold">Cấu hình PPPoE</h3>
+<button onclick="loadPppoe()" class="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-xs font-bold rounded-lg hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined text-base">refresh</span> Tải lại
+</button>
+</div>
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+<div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
+<div class="flex flex-wrap items-end gap-4">
+<div class="space-y-1">
+<label class="text-xs font-bold text-slate-500 uppercase tracking-wider">User PPPoE</label>
+<input id="pppoe-user" type="text" class="border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-sm px-3 py-2 w-56" placeholder="Nhập user PPPoE..."/>
+</div>
+<div class="space-y-1">
+<label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Password PPPoE</label>
+<input id="pppoe-pass" type="text" class="border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-sm px-3 py-2 w-56" placeholder="Nhập password PPPoE..."/>
+</div>
+<button onclick="doUpdatePppoe()" class="flex items-center gap-2 h-10 px-5 bg-primary text-white text-sm font-bold rounded-lg shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all">
+<span class="material-symbols-outlined text-lg">save</span> Cập nhật tất cả
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="text-xs font-bold text-slate-400 uppercase tracking-wider bg-slate-50 dark:bg-slate-800/50">
+<th class="px-5 py-3">Interface</th>
+<th class="px-5 py-3">User PPPoE</th>
+<th class="px-5 py-3">Password</th>
+<th class="px-5 py-3">Interface</th>
+<th class="px-5 py-3">Trạng thái</th>
+</tr>
+</thead>
+<tbody id="pppoe-tbody" class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr><td colspan="5" class="px-5 py-8 text-center text-slate-400 text-sm">Nhấn "Tải lại" để xem cấu hình PPPoE</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+</div>
+</main>
+</div>
+
+<script>
+const API = 'http://127.0.0.1:8000/api';
+let _toastTimer = null;
+let _ethPorts = [];
+
+function showConfirm(title, msg, type) {
+  return new Promise(resolve => {
+    const modal = document.getElementById('confirm-modal');
+    const iconWrap = document.getElementById('confirm-icon-wrap');
+    const icon = document.getElementById('confirm-icon');
+    document.getElementById('confirm-title').textContent = title;
+    document.getElementById('confirm-msg').textContent = msg;
+    if (type === 'danger') {
+      iconWrap.className = 'size-14 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4';
+      icon.textContent = 'delete_forever'; icon.className = 'material-symbols-outlined text-3xl text-red-500';
+      document.getElementById('confirm-ok').className = 'flex-1 py-3.5 text-sm font-bold text-white bg-red-500 hover:bg-red-600 transition-colors';
+    } else {
+      iconWrap.className = 'size-14 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-4';
+      icon.textContent = 'warning'; icon.className = 'material-symbols-outlined text-3xl text-amber-500';
+      document.getElementById('confirm-ok').className = 'flex-1 py-3.5 text-sm font-bold text-white bg-primary hover:bg-primary/90 transition-colors';
+    }
+    modal.style.display = 'flex';
+    const ok = document.getElementById('confirm-ok');
+    const cancel = document.getElementById('confirm-cancel');
+    const cleanup = (val) => { modal.style.display = 'none'; ok.onclick = null; cancel.onclick = null; resolve(val); };
+    ok.onclick = () => cleanup(true);
+    cancel.onclick = () => cleanup(false);
+  });
+}
+
+function hideToast() {
+  const toast = document.getElementById('toast');
+  toast.classList.add('translate-x-[120%]');
+  clearTimeout(_toastTimer);
+}
+function showToast(type, title, msg) {
+  clearTimeout(_toastTimer);
+  const toast = document.getElementById('toast');
+  const inner = document.getElementById('toast-inner');
+  const icon = document.getElementById('toast-icon');
+  const progress = document.getElementById('toast-progress');
+  document.getElementById('toast-title').textContent = title;
+  document.getElementById('toast-msg').textContent = msg;
+  const base = 'flex items-start gap-3 px-5 py-4 rounded-xl shadow-2xl border max-w-sm relative overflow-hidden ';
+  if (type === 'success') { inner.className = base + 'bg-emerald-50 border-emerald-200 text-emerald-800'; icon.textContent = 'check_circle'; }
+  else if (type === 'error') { inner.className = base + 'bg-red-50 border-red-200 text-red-800'; icon.textContent = 'error'; }
+  else { inner.className = base + 'bg-amber-50 border-amber-200 text-amber-800'; icon.textContent = 'warning'; }
+  progress.style.transition = 'none';
+  progress.style.width = '100%';
+  toast.classList.remove('translate-x-[120%]');
+  const duration = type === 'error' ? 6000 : 4000;
+  requestAnimationFrame(() => { progress.style.transition = 'width ' + duration + 'ms linear'; progress.style.width = '0%'; });
+  _toastTimer = setTimeout(hideToast, duration);
+}
+
+function enc(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function getMkCreds() {
+  try { const a = JSON.parse(localStorage.getItem('mk_active')); if (a && a.host) return a; } catch (_) {}
+  try { const s = JSON.parse(localStorage.getItem('mk_saved')); if (s && s.host) return s; } catch (_) {}
+  return null;
+}
+
+async function loadEthernet() {
+  const creds = getMkCreds();
+  if (!creds) { showToast('warn', 'Chưa kết nối', 'Vui lòng kết nối HT Proxy trước'); return; }
+  showToast('warn', 'Đang tải...', 'Đọc cổng Ethernet...');
+  try {
+    const res = await fetch(API + '/mikrotik/ethernet-status', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(creds),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    _ethPorts = data.ports || [];
+    renderEthernet();
+    populateEtherSelect();
+    showToast('success', 'Đã tải', _ethPorts.length + ' cổng');
+  } catch (e) { showToast('error', 'Lỗi', e.message); }
+}
+
+function renderEthernet() {
+  const tbody = document.getElementById('eth-tbody');
+  if (_ethPorts.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" class="px-5 py-8 text-center text-slate-400 text-sm">Không tìm thấy cổng Ethernet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = _ethPorts.map(p => {
+    const plugged = p.running && !p.disabled;
+    const statusClass = plugged
+      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+      : (p.disabled ? 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400');
+    const statusText = plugged ? '✓ Đã cắm' : (p.disabled ? 'Tắt' : '✗ Chưa cắm');
+    const statusDot = plugged ? 'bg-emerald-500' : (p.disabled ? 'bg-slate-400' : 'bg-red-500');
+    return '<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">' +
+      '<td class="px-5 py-3"><div class="flex items-center gap-2.5">' +
+        '<span class="material-symbols-outlined text-lg ' + (plugged ? 'text-emerald-500' : 'text-slate-300') + '">settings_ethernet</span>' +
+        '<span class="text-sm font-bold">' + enc(p.name) + '</span>' +
+      '</div></td>' +
+      '<td class="px-5 py-3"><span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ' + statusClass + '">' +
+        '<span class="size-1.5 rounded-full ' + statusDot + '"></span>' + statusText + '</span></td>' +
+      '<td class="px-5 py-3 text-sm text-slate-500">' + (plugged && p.speed ? p.speed : '—') + '</td>' +
+      '<td class="px-5 py-3 text-xs font-mono text-slate-400">' + enc(p.mac) + '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+function populateEtherSelect() {
+  const sel = document.getElementById('mv-ether');
+  const plugged = _ethPorts.filter(p => p.running && !p.disabled);
+  sel.innerHTML = plugged.map(p => '<option value="' + enc(p.name) + '">' + enc(p.name) + ' (đã cắm)</option>').join('');
+  if (plugged.length === 0) {
+    sel.innerHTML = _ethPorts.map(p => '<option value="' + enc(p.name) + '">' + enc(p.name) + '</option>').join('');
+  }
+}
+
+async function loadMacvlan() {
+  const creds = getMkCreds();
+  if (!creds) { showToast('warn', 'Chưa kết nối', 'Vui lòng kết nối HT Proxy trước'); return; }
+  showToast('warn', 'Đang tải...', 'Đọc danh sách Mac Address...');
+  try {
+    const res = await fetch(API + '/mikrotik/macvlan-list', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(creds),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    renderMacvlan(data.macvlans || []);
+    showToast('success', 'Đã tải', (data.macvlans||[]).length + ' Mac Address');
+  } catch (e) { showToast('error', 'Lỗi', e.message); }
+}
+
+function renderMacvlan(list) {
+  const tbody = document.getElementById('mv-tbody');
+  if (list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="px-5 py-8 text-center text-slate-400 text-sm">Chưa có dữ liệu</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map((m, i) => {
+    const isFirst = m.name === 'macvlan1';
+    const running = m.running && !m.disabled;
+    return '<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors ' + (isFirst ? 'bg-amber-50/30 dark:bg-amber-900/10' : '') + '">' +
+      '<td class="px-5 py-3 text-xs font-medium text-slate-400">' + (i+1) + (isFirst ? ' <span class="text-amber-500">🔒</span>' : '') + '</td>' +
+      '<td class="px-5 py-3 text-sm">' + enc(m.interface) + '</td>' +
+      '<td class="px-5 py-3 text-xs font-mono text-slate-400">' + enc(m.mac) + '</td>' +
+      '<td class="px-5 py-3 text-xs">' + enc(m.mode) + '</td>' +
+      '<td class="px-5 py-3"><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ' +
+        (running ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-slate-100 text-slate-500') + '">' +
+        '<span class="size-1.5 rounded-full ' + (running ? 'bg-emerald-500' : 'bg-slate-400') + '"></span>' +
+        (running ? 'Running' : 'Stopped') + '</span></td>' +
+    '</tr>';
+  }).join('');
+}
+
+async function doRecreateMacvlan() {
+  const ether = document.getElementById('mv-ether').value;
+  const count = parseInt(document.getElementById('mv-count').value) || 0;
+  if (!ether) { showToast('warn', 'Chọn Ethernet', 'Chọn cổng ethernet gốc'); return; }
+  if (count < 2) { showToast('warn', 'Số lượng', 'Nhập số lượng >= 2'); return; }
+  if (!await showConfirm('Xóa & Tạo mới', 'Xóa và tạo mới ' + (count - 1) + ' Mac Address trên ' + ether + '?', 'danger')) return;
+
+  const creds = getMkCreds();
+  if (!creds) return;
+  showToast('warn', 'Đang xử lý...', 'Đang xóa và tạo mới...');
+  try {
+    const res = await fetch(API + '/mikrotik/recreate-macvlan?ethernet=' + encodeURIComponent(ether) + '&count=' + count, {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(creds),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const reassigned = (data.reassigned || []);
+    let msg = 'Đã xóa ' + data.removed + ', tạo mới ' + data.created + ' Mac Address';
+    if (reassigned.length) msg += '\nCập nhật PPPoE: ' + reassigned.join(', ');
+    showToast('success', 'Hoàn tất', msg);
+    await loadMacvlan();
+    await loadPppoe();
+  } catch (e) { showToast('error', 'Lỗi', e.message); }
+}
+
+async function loadPppoe() {
+  const creds = getMkCreds();
+  if (!creds) { showToast('warn', 'Chưa kết nối', 'Vui lòng kết nối HT Proxy trước'); return; }
+  showToast('warn', 'Đang tải...', 'Đọc cấu hình PPPoE...');
+  try {
+    const res = await fetch(API + '/mikrotik/pppoe-config', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(creds),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    renderPppoe(data.pppoe || []);
+    showToast('success', 'Đã tải', (data.pppoe||[]).length + ' PPPoE interface');
+  } catch (e) { showToast('error', 'Lỗi', e.message); }
+}
+
+function renderPppoe(list) {
+  const tbody = document.getElementById('pppoe-tbody');
+  if (list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="px-5 py-8 text-center text-slate-400 text-sm">Chưa có PPPoE interface</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(p => {
+    const isFirst = p.name === 'pppoe-out1';
+    const running = p.running && !p.disabled;
+    return '<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors ' + (isFirst ? 'bg-amber-50/30 dark:bg-amber-900/10' : '') + '">' +
+      '<td class="px-5 py-3"><span class="text-sm font-bold">' + enc(p.name) + '</span>' +
+        (isFirst ? ' <span class="text-[10px] text-amber-600 font-bold">🔒 Điều khiển</span>' : '') + '</td>' +
+      '<td class="px-5 py-3 text-sm font-mono">' + enc(p.user) + '</td>' +
+      '<td class="px-5 py-3 text-sm font-mono text-slate-500">' + (p.password ? '••••••••' : '<span class="text-slate-300 italic">Trống</span>') + '</td>' +
+      '<td class="px-5 py-3 text-sm">' + enc(p.interface) + '</td>' +
+      '<td class="px-5 py-3"><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ' +
+        (running ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400') + '">' +
+        '<span class="size-1.5 rounded-full ' + (running ? 'bg-emerald-500' : 'bg-red-500') + '"></span>' +
+        (running ? 'Running' : (p.disabled ? 'Disabled' : 'Disconnected')) + '</span></td>' +
+    '</tr>';
+  }).join('');
+}
+
+async function doUpdatePppoe() {
+  const user = document.getElementById('pppoe-user').value.trim();
+  const pass = document.getElementById('pppoe-pass').value.trim();
+  if (!user && !pass) { showToast('warn', 'Thiếu thông tin', 'Nhập user hoặc password PPPoE'); return; }
+  if (!await showConfirm('Cập nhật PPPoE', 'Cập nhật user/pass PPPoE cho tất cả interface?')) return;
+
+  const creds = getMkCreds();
+  if (!creds) return;
+  showToast('warn', 'Đang cập nhật...', 'Sửa PPPoE credentials...');
+  try {
+    const res = await fetch(API + '/mikrotik/update-pppoe-creds?pppoe_user=' + encodeURIComponent(user) + '&pppoe_password=' + encodeURIComponent(pass), {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(creds),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    showToast('success', 'Hoàn tất', 'Đã cập nhật ' + data.count + ' interface: ' + (data.updated||[]).join(', '));
+    await loadPppoe();
+  } catch (e) { showToast('error', 'Lỗi', e.message); }
+}
+
+if (getMkCreds()) {
+  loadEthernet().then(() => {
+    loadMacvlan();
+    loadPppoe();
+  });
+}
+(function(){try{const p=window.parent,el=document.getElementById('header-user-name');if(el&&p&&p._userName)el.textContent=p._userName;else if(el)el.textContent=localStorage.getItem('ht_user_name')||'...';}catch(_){}})();
+</script>
+</body></html>

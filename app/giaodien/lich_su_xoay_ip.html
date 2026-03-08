@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: { "primary": "#1349ec", "background-light": "#f6f6f8", "background-dark": "#101522" },
+      fontFamily: { "display": ["Inter"] },
+      borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+    },
+  },
+}
+</script>
+<title>Lịch sử xoay IP - HT Proxy</title>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<script>if(location.search.includes('embed=1')){document.write('<style>aside{display:none!important}.max-w-5xl,.max-w-6xl,.max-w-7xl{max-width:100%!important}</style>');}</script>
+<div class="flex h-screen overflow-hidden">
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0">
+<div class="p-6 flex items-center gap-3">
+<div class="size-10 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-2xl">shield_person</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-lg font-bold leading-tight tracking-tight">HT Proxy</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium">v2.6.0 Professional</p>
+</div>
+</div>
+<nav class="flex-1 px-4 py-2 space-y-1">
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">dashboard</span><span class="text-sm font-medium">Bảng điều khiển</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">settings</span><span class="text-sm font-medium">Cài đặt</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary text-white"><span class="material-symbols-outlined text-[22px]">history</span><span class="text-sm font-semibold">Lịch sử xoay</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">description</span><span class="text-sm font-medium">Nhật ký</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">person_add</span><span class="text-sm font-medium">Gán Proxy</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">verified_user</span><span class="text-sm font-medium">Kiểm tra Proxy</span></div>
+<div class="pt-4 pb-2"><p class="px-3 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Hỗ trợ &amp; Tài liệu</p></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">mail</span><span class="text-sm font-medium">Liên hệ</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">info</span><span class="text-sm font-medium">Giới thiệu</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">menu_book</span><span class="text-sm font-medium">Hướng dẫn</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[22px]">code</span><span class="text-sm font-medium">API</span></div>
+</nav>
+<div class="p-4 mt-auto">
+<button class="w-full py-2.5 bg-primary/10 dark:bg-primary/20 text-primary rounded-lg text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined text-lg">upgrade</span><span>Nâng cấp Gói</span>
+</button>
+</div>
+</aside>
+<main class="flex-1 flex flex-col overflow-hidden">
+<header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between px-8 shrink-0">
+<div class="flex items-center gap-3">
+<button class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-symbols-outlined text-xl block dark:hidden">dark_mode</span>
+<span class="material-symbols-outlined text-xl hidden dark:block">light_mode</span>
+</button>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 relative">
+<span class="material-symbols-outlined text-xl">notifications</span>
+</button>
+<div class="h-8 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<div class="flex items-center gap-2.5 cursor-pointer group" onclick="window.parent?.postMessage('ht_go_profile','*')">
+<div class="text-right hidden sm:block"><p id="header-user-name" class="text-sm font-bold truncate max-w-[120px]">...</p><p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Người dùng</p></div>
+<div class="size-9 rounded-full bg-primary/20 overflow-hidden border-2 border-transparent group-hover:border-primary transition-all"><img src="../logouser.png" alt="Avatar" class="w-full h-full object-cover"></div>
+</div>
+<button onclick="window.parent?.document.getElementById('btn-logout')?.click()" class="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors" title="Đăng xuất"><span class="material-symbols-outlined text-xl">logout</span></button>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-8">
+<div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Lịch sử xoay IP</h1>
+<p class="text-slate-500 dark:text-slate-400 mt-1">Theo dõi và giám sát mọi thay đổi địa chỉ IP trong hệ thống của bạn.</p>
+</div>
+<style>
+  .f-select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1.5 1.75L5 5.25l3.5-3.5' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center;background-size:10px 6px;padding-right:22px!important;cursor:pointer}
+</style>
+<div class="flex items-center gap-1.5 flex-wrap">
+<select id="filter-date" onchange="_page=1;renderHistory()" class="f-select px-2 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-xs font-medium">
+  <option value="all">Thời gian</option>
+  <option value="today">Hôm nay</option>
+  <option value="yesterday">Hôm qua</option>
+  <option value="7d">7 ngày</option>
+  <option value="30d">30 ngày</option>
+  <option value="custom">Tùy chọn</option>
+</select>
+<input id="filter-date-from" type="date" class="px-2 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-xs font-medium hidden" onchange="_page=1;renderHistory()"/>
+<input id="filter-date-to" type="date" class="px-2 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-xs font-medium hidden" onchange="_page=1;renderHistory()"/>
+<select id="filter-status" onchange="_page=1;renderHistory()" class="f-select px-2 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-xs font-medium">
+  <option value="all">Trạng thái</option>
+  <option value="success">Thành công</option>
+  <option value="failed">Thất bại</option>
+  <option value="duplicate">Trùng IP</option>
+</select>
+<select id="filter-source" onchange="_page=1;renderHistory()" class="f-select px-2 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-xs font-medium">
+  <option value="all">Nguồn</option>
+  <option value="app">APP</option>
+  <option value="api">API</option>
+</select>
+<select id="filter-router" onchange="_page=1;renderHistory()" class="f-select px-2 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-xs font-medium max-w-[160px]">
+  <option value="all">Tất cả Router</option>
+</select>
+<input id="filter-iface" type="text" placeholder="Interface..." class="px-2 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-xs font-medium w-24" oninput="_page=1;renderHistory()"/>
+<button onclick="clearHistory()" class="flex items-center gap-1 px-2.5 py-1.5 bg-rose-50 text-rose-600 border border-rose-200 rounded-md text-xs font-bold hover:bg-rose-500 hover:text-white transition-all">
+<span class="material-symbols-outlined text-sm">delete</span> Xóa
+</button>
+<button onclick="exportHistory()" class="flex items-center gap-1 px-2.5 py-1.5 bg-primary text-white rounded-md text-xs font-medium hover:bg-primary/90 transition-shadow shadow-sm">
+<span class="material-symbols-outlined text-sm">download</span> Xuất
+</button>
+</div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-primary p-2 bg-primary/10 rounded-lg">sync</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Tổng lượt xoay</p>
+<h3 id="stat-total" class="text-2xl font-bold mt-1">0</h3>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-green-500 p-2 bg-green-100 rounded-lg">check_circle</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Thành công</p>
+<h3 id="stat-success" class="text-2xl font-bold mt-1 text-green-600">0</h3>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-red-500 p-2 bg-red-100 rounded-lg">cancel</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Thất bại</p>
+<h3 id="stat-failed" class="text-2xl font-bold mt-1 text-red-600">0</h3>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-amber-500 p-2 bg-amber-100 rounded-lg">percent</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Tỉ lệ thành công</p>
+<h3 id="stat-rate" class="text-2xl font-bold mt-1">—</h3>
+</div>
+</div>
+
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">STT</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Nguồn</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Router</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Mã Proxy</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Thời gian xoay</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">IP Cũ</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">IP Mới</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Trạng thái</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">Thử lại</th>
+</tr>
+</thead>
+<tbody id="history-tbody" class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr><td colspan="9" class="px-6 py-12 text-center text-slate-400 text-sm">Chưa có lịch sử xoay IP</td></tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 flex items-center justify-between bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+<span id="pagination-text" class="text-sm text-slate-500">Không có dữ liệu</span>
+<div class="flex gap-2">
+<button onclick="changePage(-1)" class="size-8 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-50">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<span id="page-num" class="size-8 flex items-center justify-center rounded bg-primary text-white text-sm font-bold">1</span>
+<button onclick="changePage(1)" class="size-8 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-50">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+<script>
+const PAGE_SIZE = 20;
+let _page = 1;
+let _allMerged = [];
+let _apiLogsFetched = false;
+
+document.getElementById('filter-date').addEventListener('change', function() {
+  const custom = this.value === 'custom';
+  document.getElementById('filter-date-from').classList.toggle('hidden', !custom);
+  document.getElementById('filter-date-to').classList.toggle('hidden', !custom);
+});
+
+function getLocalHistory() {
+  try { return JSON.parse(localStorage.getItem('rotation_history') || '[]'); }
+  catch (_) { return []; }
+}
+
+function populateRouterFilter() {
+  const hosts = new Set();
+  for (const h of _allMerged) {
+    if (h.host) hosts.add(h.host);
+  }
+  try {
+    const mrList = JSON.parse(localStorage.getItem('multi_routers') || '[]');
+    for (const r of mrList) { if (r.host) hosts.add(r.host.trim()); }
+  } catch (_) {}
+  try {
+    const single = JSON.parse(localStorage.getItem('mk_saved') || '{}');
+    if (single.host) hosts.add(single.host.trim());
+  } catch (_) {}
+
+  const sel = document.getElementById('filter-router');
+  const current = sel.value;
+  sel.innerHTML = '<option value="all">Tất cả Router</option>';
+  const sorted = [...hosts].sort();
+  for (const host of sorted) {
+    const short = host.split('.')[0] || host;
+    const opt = document.createElement('option');
+    opt.value = host;
+    opt.textContent = short;
+    sel.appendChild(opt);
+  }
+  if (current && current !== 'all') sel.value = current;
+}
+
+function hashColor(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = str.charCodeAt(i) + ((h << 5) - h);
+  const hue = Math.abs(h) % 360;
+  return 'hsl(' + hue + ',65%,45%)';
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+async function fetchApiLogs() {
+  try {
+    const apiHost = localStorage.getItem('api_host') || '';
+    if (!apiHost) return [];
+    const res = await fetch(apiHost + '/logs?limit=500');
+    const data = await res.json();
+    return (data.logs || []).map(l => ({
+      iface: l.interface || '',
+      time: l.created_at ? l.created_at.replace(' ', 'T') + 'Z' : '',
+      old_ip: l.old_ip || '',
+      new_ip: l.new_ip || '',
+      status: l.success ? 'success' : 'failed',
+      attempts: l.retries || 0,
+      host: l.host || '',
+      source: (l.source || 'api').toLowerCase(),
+    }));
+  } catch (_) { return []; }
+}
+
+async function loadAllHistory() {
+  const local = getLocalHistory();
+  const apiLogs = await fetchApiLogs();
+  _apiLogsFetched = true;
+
+  const seen = new Set();
+  const merged = [];
+
+  for (const h of local) {
+    const key = (h.time || '') + '|' + (h.iface || '') + '|' + (h.old_ip || '') + '|' + (h.new_ip || '');
+    seen.add(key);
+    if (!h.source) h.source = 'app';
+    merged.push(h);
+  }
+
+  for (const h of apiLogs) {
+    const key = (h.time || '') + '|' + (h.iface || '') + '|' + (h.old_ip || '') + '|' + (h.new_ip || '');
+    if (h.source === 'api' && !seen.has(key)) {
+      seen.add(key);
+      merged.push(h);
+    }
+  }
+
+  merged.sort((a, b) => {
+    const ta = new Date(a.time || 0).getTime();
+    const tb = new Date(b.time || 0).getTime();
+    return tb - ta;
+  });
+
+  _allMerged = merged;
+  populateRouterFilter();
+  renderHistory();
+}
+
+function getDateRange() {
+  const sel = document.getElementById('filter-date').value;
+  const now = new Date();
+  const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  let from = null, to = null;
+
+  if (sel === 'today') {
+    from = startOfDay(now);
+    to = new Date(from.getTime() + 86400000);
+  } else if (sel === 'yesterday') {
+    to = startOfDay(now);
+    from = new Date(to.getTime() - 86400000);
+  } else if (sel === '7d') {
+    to = new Date(now.getTime() + 86400000);
+    from = new Date(now.getTime() - 7 * 86400000);
+    from = startOfDay(from);
+  } else if (sel === '30d') {
+    to = new Date(now.getTime() + 86400000);
+    from = new Date(now.getTime() - 30 * 86400000);
+    from = startOfDay(from);
+  } else if (sel === 'custom') {
+    const fv = document.getElementById('filter-date-from').value;
+    const tv = document.getElementById('filter-date-to').value;
+    if (fv) from = new Date(fv);
+    if (tv) to = new Date(new Date(tv).getTime() + 86400000);
+  }
+  return { from, to };
+}
+
+function getFiltered() {
+  const statusFilter = document.getElementById('filter-status').value;
+  const sourceFilter = document.getElementById('filter-source').value;
+  const routerFilter = document.getElementById('filter-router').value;
+  const ifaceFilter = (document.getElementById('filter-iface').value || '').toLowerCase().trim();
+  const { from, to } = getDateRange();
+  let hist = _allMerged.slice();
+
+  if (statusFilter !== 'all') hist = hist.filter(h => h.status === statusFilter);
+  if (sourceFilter !== 'all') hist = hist.filter(h => (h.source || 'app').toLowerCase() === sourceFilter);
+  if (routerFilter !== 'all') hist = hist.filter(h => (h.host || '') === routerFilter);
+
+  if (from || to) {
+    hist = hist.filter(h => {
+      const t = new Date(h.time).getTime();
+      if (from && t < from.getTime()) return false;
+      if (to && t >= to.getTime()) return false;
+      return true;
+    });
+  }
+
+  if (ifaceFilter) hist = hist.filter(h => (h.iface || '').toLowerCase().includes(ifaceFilter));
+
+  return hist;
+}
+
+function formatTime(iso) {
+  try {
+    const d = new Date(iso);
+    const pad = n => String(n).padStart(2, '0');
+    return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()) +
+      '<br><span class="text-xs text-slate-400">' + pad(d.getDate()) + '/' + pad(d.getMonth()+1) + '/' + d.getFullYear() + '</span>';
+  } catch (_) { return iso || '—'; }
+}
+
+function statusBadge(s) {
+  if (s === 'success') return '<span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"><span class="size-1.5 rounded-full bg-green-500"></span> Thành công</span>';
+  if (s === 'duplicate') return '<span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"><span class="size-1.5 rounded-full bg-amber-500"></span> Trùng IP</span>';
+  if (s === 'unchanged') return '<span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300"><span class="size-1.5 rounded-full bg-slate-400"></span> Không đổi</span>';
+  return '<span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-xs font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"><span class="size-1.5 rounded-full bg-red-500"></span> Thất bại</span>';
+}
+
+function sourceBadge(src) {
+  const isApp = (src || '').toLowerCase() === 'app';
+  if (isApp) {
+    return '<span class="inline-flex items-center gap-1 py-1 px-2 rounded-lg text-[10px] font-bold bg-orange-100 dark:bg-orange-900/30 text-orange-600">' +
+      '<span class="material-symbols-outlined text-xs">desktop_windows</span>APP</span>';
+  }
+  return '<span class="inline-flex items-center gap-1 py-1 px-2 rounded-lg text-[10px] font-bold bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600">' +
+    '<span class="material-symbols-outlined text-xs">api</span>API</span>';
+}
+
+function hostBadge(host) {
+  if (!host) return '<span class="text-slate-400 text-xs">—</span>';
+  const short = host.split('.')[0] || host;
+  const color = hashColor(host);
+  return '<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold" style="background:' + color + '15;color:' + color + '">' +
+    '<span class="w-2 h-2 rounded-full" style="background:' + color + '"></span>' + esc(short) + '</span>';
+}
+
+function renderHistory() {
+  const all = _allMerged;
+  const filtered = getFiltered();
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (_page > totalPages) _page = totalPages;
+
+  const success = filtered.filter(h => h.status === 'success').length;
+  const failed = filtered.filter(h => h.status === 'failed' || h.status === 'error').length;
+  const isFilterActive = document.getElementById('filter-date').value !== 'all' ||
+                         document.getElementById('filter-status').value !== 'all' ||
+                         document.getElementById('filter-iface').value.trim();
+  document.getElementById('stat-total').textContent = isFilterActive ? filtered.length + ' / ' + all.length : all.length;
+  document.getElementById('stat-success').textContent = success;
+  document.getElementById('stat-failed').textContent = failed;
+  document.getElementById('stat-rate').textContent = filtered.length > 0 ? (success / filtered.length * 100).toFixed(1) + '%' : '—';
+
+  const start = (_page - 1) * PAGE_SIZE;
+  const page = filtered.slice(start, start + PAGE_SIZE);
+  const tbody = document.getElementById('history-tbody');
+
+  if (page.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" class="px-6 py-12 text-center text-slate-400 text-sm">Chưa có lịch sử xoay IP</td></tr>';
+  } else {
+    tbody.innerHTML = page.map((h, i) => {
+      const stt = start + i + 1;
+      return '<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">' +
+        '<td class="px-6 py-4 text-sm font-medium text-slate-400">' + String(stt).padStart(3, '0') + '</td>' +
+        '<td class="px-6 py-4">' + sourceBadge(h.source) + '</td>' +
+        '<td class="px-6 py-4">' + hostBadge(h.host) + '</td>' +
+        '<td class="px-6 py-4"><span class="font-mono text-sm font-semibold text-primary">' + esc(h.iface || '—') + '</span></td>' +
+        '<td class="px-6 py-4"><div class="flex flex-col">' + formatTime(h.time) + '</div></td>' +
+        '<td class="px-6 py-4 text-sm text-slate-500 ' + (h.old_ip ? 'line-through decoration-slate-300' : '') + '">' + (h.old_ip || '—') + '</td>' +
+        '<td class="px-6 py-4">' + (h.new_ip
+          ? '<div class="flex items-center gap-2"><span class="font-mono text-sm font-bold text-slate-900 dark:text-white">' + h.new_ip + '</span>' + (h.status === 'success' ? '<span class="material-symbols-outlined text-sm text-green-500">verified</span>' : '') + '</div>'
+          : '<span class="text-sm text-slate-400 italic">N/A</span>') +
+        '</td>' +
+        '<td class="px-6 py-4">' + statusBadge(h.status) + '</td>' +
+        '<td class="px-6 py-4 text-right text-sm font-mono text-slate-500">' + (h.attempts || '—') + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  document.getElementById('pagination-text').textContent = total > 0
+    ? 'Hiển thị ' + (start+1) + ' - ' + Math.min(start + PAGE_SIZE, total) + ' trong số ' + total + ' bản ghi'
+    : 'Không có dữ liệu';
+  document.getElementById('page-num').textContent = _page;
+}
+
+function changePage(delta) {
+  const total = getFiltered().length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const np = _page + delta;
+  if (np >= 1 && np <= totalPages) { _page = np; renderHistory(); }
+}
+
+function clearHistory() {
+  if (!confirm('Bạn có chắc muốn xóa toàn bộ lịch sử xoay IP?')) return;
+  localStorage.removeItem('rotation_history');
+  _allMerged = [];
+  _page = 1;
+  renderHistory();
+  clearApiLogs();
+}
+
+async function clearApiLogs() {
+  try {
+    const apiHost = localStorage.getItem('api_host') || '';
+    if (apiHost) await fetch(apiHost + '/logs', { method: 'DELETE' });
+  } catch (_) {}
+}
+
+function exportHistory() {
+  const hist = getFiltered();
+  if (hist.length === 0) return;
+  const header = 'STT,Nguồn,Router,Interface,Thời gian,IP Cũ,IP Mới,Trạng thái,Số lần thử';
+  const rows = hist.map((h, i) => [
+    i + 1, (h.source || 'app').toUpperCase(), h.host || '', h.iface, h.time, h.old_ip || '', h.new_ip || '', h.status, h.attempts || 0
+  ].join(','));
+  const csv = header + '\n' + rows.join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'rotation_history_' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+loadAllHistory();
+
+window.addEventListener('storage', function(e) {
+  if (e.key === 'rotation_history') loadAllHistory();
+});
+(function(){try{const p=window.parent,el=document.getElementById('header-user-name');if(el&&p&&p._userName)el.textContent=p._userName;else if(el)el.textContent=localStorage.getItem('ht_user_name')||'...';}catch(_){}})();
+</script>
+</body></html>

@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html class="light" lang="vi">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Admin Panel - HT Proxy</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: { "primary": "#1349ec", "background-light": "#f6f6f8", "background-dark": "#101522" },
+          fontFamily: { "display": ["Inter"] },
+          borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+        },
+      },
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 999px;
+    }
+  </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen">
+
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside
+      class="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark flex flex-col">
+      <div class="p-6 flex items-center gap-3">
+        <div class="size-10 bg-red-600 rounded-lg flex items-center justify-center text-white">
+          <span class="material-symbols-outlined text-2xl">admin_panel_settings</span>
+        </div>
+        <div class="flex flex-col">
+          <h1 class="text-lg font-bold leading-tight tracking-tight">HT Admin</h1>
+          <p class="text-red-500 text-xs font-bold uppercase tracking-wider">Local Admin</p>
+        </div>
+      </div>
+      <nav class="flex-1 overflow-y-auto px-4 py-2 space-y-1 custom-scrollbar">
+        <div onclick="switchTab('dashboard')"
+          class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors bg-primary text-white"
+          data-tab="dashboard">
+          <span class="material-symbols-outlined text-[22px]">dashboard</span><span class="text-sm font-semibold">Tổng
+            quan</span>
+        </div>
+        <div onclick="switchTab('users')"
+          class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+          data-tab="users">
+          <span class="material-symbols-outlined text-[22px]">group</span><span class="text-sm font-medium">Quản lý
+            User</span>
+        </div>
+        <div onclick="switchTab('keys')"
+          class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+          data-tab="keys">
+          <span class="material-symbols-outlined text-[22px]">vpn_key</span><span class="text-sm font-medium">License
+            Keys</span>
+        </div>
+        <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+          <p class="px-3 mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cấu hình</p>
+          <div onclick="switchTab('config')"
+            class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+            data-tab="config">
+            <span class="material-symbols-outlined text-[22px]">settings</span><span class="text-sm font-medium">Cấu
+              hình API</span>
+          </div>
+        </div>
+      </nav>
+      <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+        <p class="text-[10px] text-slate-400 text-center">Chỉ chạy trên máy local</p>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+      <header
+        class="h-16 flex-shrink-0 bg-white dark:bg-background-dark border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
+        <h2 id="page-title" class="text-lg font-bold">Tổng quan</h2>
+        <div class="flex items-center gap-3">
+          <button
+            class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
+            onclick="document.documentElement.classList.toggle('dark')">
+            <span class="material-symbols-outlined text-xl block dark:hidden">dark_mode</span>
+            <span class="material-symbols-outlined text-xl hidden dark:block">light_mode</span>
+          </button>
+          <div class="flex items-center gap-2">
+            <div class="size-8 rounded-full bg-red-100 flex items-center justify-center">
+              <span class="material-symbols-outlined text-red-600 text-lg">shield_person</span>
+            </div>
+            <span class="text-sm font-bold">Admin</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Toast -->
+      <div id="toast" class="fixed top-6 right-6 z-[9999] hidden">
+        <div id="toast-inner" class="flex items-start gap-3 px-5 py-4 rounded-xl shadow-2xl border max-w-sm">
+          <span id="toast-icon" class="material-symbols-outlined text-xl mt-0.5"></span>
+          <div>
+            <p id="toast-title" class="text-sm font-bold"></p>
+            <p id="toast-msg" class="text-xs mt-0.5 opacity-80"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-8 space-y-6">
+
+        <!-- DASHBOARD -->
+        <div id="tab-dashboard" class="tab-content">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div
+              class="bg-white dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng User</p>
+                  <h3 id="stat-total" class="text-3xl font-black mt-1">0</h3>
+                </div>
+                <div class="size-12 rounded-xl bg-primary/10 flex items-center justify-center"><span
+                    class="material-symbols-outlined text-primary text-2xl">group</span></div>
+              </div>
+            </div>
+            <div
+              class="bg-white dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">User hoạt động</p>
+                  <h3 id="stat-active" class="text-3xl font-black text-emerald-500 mt-1">0</h3>
+                </div>
+                <div class="size-12 rounded-xl bg-emerald-100 flex items-center justify-center"><span
+                    class="material-symbols-outlined text-emerald-600 text-2xl">check_circle</span></div>
+              </div>
+            </div>
+            <div
+              class="bg-white dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">License Keys</p>
+                  <h3 id="stat-keys" class="text-3xl font-black text-amber-500 mt-1">0</h3>
+                </div>
+                <div class="size-12 rounded-xl bg-amber-100 flex items-center justify-center"><span
+                    class="material-symbols-outlined text-amber-600 text-2xl">vpn_key</span></div>
+              </div>
+            </div>
+            <div
+              class="bg-white dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Đang dùng MikroTik</p>
+                  <h3 id="stat-mikrotik" class="text-3xl font-black text-blue-500 mt-1">0</h3>
+                </div>
+                <div class="size-12 rounded-xl bg-blue-100 flex items-center justify-center"><span
+                    class="material-symbols-outlined text-blue-600 text-2xl">router</span></div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
+              <h4 class="font-bold flex items-center gap-2"><span
+                  class="material-symbols-outlined text-primary">history</span> Đăng nhập gần đây</h4>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead>
+                  <tr
+                    class="text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
+                    <th class="px-6 py-3">User ID</th>
+                    <th class="px-6 py-3">IP</th>
+                    <th class="px-6 py-3">Vị trí</th>
+                    <th class="px-6 py-3">Thiết bị</th>
+                    <th class="px-6 py-3">Thời gian</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-logins" class="divide-y divide-slate-100 dark:divide-slate-800">
+                  <tr>
+                    <td colspan="5" class="px-6 py-8 text-center text-sm text-slate-400">Đang tải...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- USERS -->
+        <div id="tab-users" class="tab-content hidden">
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+            <div>
+              <h2 class="text-2xl font-black tracking-tight">Quản lý người dùng</h2>
+              <p class="text-slate-500 text-sm mt-1">Thêm, sửa, xóa user. Xem thông tin MikroTik, lịch sử đăng nhập.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="relative">
+                <span
+                  class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+                <input id="user-search" type="text" placeholder="Tìm email hoặc tên..."
+                  class="pl-10 pr-4 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 w-64"
+                  oninput="debounceSearch()" />
+              </div>
+              <button onclick="openUserModal()"
+                class="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all">
+                <span class="material-symbols-outlined text-lg">person_add</span> Thêm User</button>
+              <button onclick="loadUsers()"
+                class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-200 transition-all">
+                <span class="material-symbols-outlined text-lg">refresh</span></button>
+            </div>
+          </div>
+          <div
+            class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr
+                    class="text-[10px] font-black text-slate-400 uppercase tracking-wider bg-slate-50 dark:bg-slate-800/50">
+                    <th class="px-4 py-3 w-10">STT</th>
+                    <th class="px-4 py-3">Họ tên</th>
+                    <th class="px-4 py-3">Email</th>
+                    <th class="px-4 py-3">Role</th>
+                    <th class="px-4 py-3">License</th>
+                    <th class="px-4 py-3">MikroTik</th>
+                    <th class="px-4 py-3">Đăng nhập cuối</th>
+                    <th class="px-4 py-3">Trạng thái</th>
+                    <th class="px-4 py-3 text-right">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody id="user-tbody" class="divide-y divide-slate-100 dark:divide-slate-800">
+                  <tr>
+                    <td colspan="9" class="px-6 py-12 text-center text-slate-400 text-sm">Đang tải...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="px-5 py-3 border-t border-slate-200 dark:border-slate-800"><span id="user-count-text"
+                class="text-xs font-medium text-slate-500">Đang tải...</span></div>
+          </div>
+        </div>
+
+        <!-- KEYS -->
+        <div id="tab-keys" class="tab-content hidden">
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+            <div>
+              <h2 class="text-2xl font-black tracking-tight">Quản lý License Keys</h2>
+              <p class="text-slate-500 text-sm mt-1">Tạo key kích hoạt cho user, theo dõi sử dụng.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="openKeyModal()"
+                class="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all">
+                <span class="material-symbols-outlined text-lg">add</span> Tạo Key</button>
+              <button onclick="loadKeys()"
+                class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-200 transition-all">
+                <span class="material-symbols-outlined text-lg">refresh</span></button>
+            </div>
+          </div>
+          <div
+            class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr
+                    class="text-[10px] font-black text-slate-400 uppercase tracking-wider bg-slate-50 dark:bg-slate-800/50">
+                    <th class="px-4 py-3">Key</th>
+                    <th class="px-4 py-3">Gói</th>
+                    <th class="px-4 py-3">Hết hạn</th>
+                    <th class="px-4 py-3">User</th>
+                    <th class="px-4 py-3">Trạng thái</th>
+                    <th class="px-4 py-3">Ngày tạo</th>
+                    <th class="px-4 py-3 text-right">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody id="key-tbody" class="divide-y divide-slate-100 dark:divide-slate-800">
+                  <tr>
+                    <td colspan="7" class="px-6 py-12 text-center text-slate-400 text-sm">Đang tải...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONFIG -->
+        <div id="tab-config" class="tab-content hidden">
+          <div class="max-w-2xl">
+            <div class="flex flex-col gap-4 mb-6">
+              <div>
+                <h2 class="text-2xl font-black tracking-tight">Cấu hình API Server</h2>
+                <p class="text-slate-500 text-sm mt-1">URL API sẽ được tự động hiển thị cho user trong tab API của ứng
+                  dụng</p>
+              </div>
+            </div>
+
+            <div
+              class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-5">
+
+              <div>
+                <label class="block text-sm font-bold mb-2">API Server URL</label>
+                <div class="flex gap-2">
+                  <input id="cfg-api-url" type="text" placeholder="http://api.huynhty.proxydaphien.ltd"
+                    class="flex-1 px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-sm font-mono" />
+                  <button onclick="testApiUrl()"
+                    class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm font-bold hover:bg-slate-200 flex items-center gap-1 shrink-0">
+                    <span class="material-symbols-outlined text-lg">wifi_tethering</span> Test</button>
+                </div>
+                <p id="cfg-api-status" class="text-xs mt-2 text-slate-400">Nhập URL API server đã deploy trên WinServer
+                </p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-bold mb-2">MikroTik API Port</label>
+                <div class="flex items-center gap-3">
+                  <input id="cfg-mk-port" type="number" value="3544"
+                    class="w-32 px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-sm font-mono" />
+                  <p class="text-xs text-slate-400">Port API của MikroTik (mặc định: 3544)</p>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-bold mb-2">Ghi chú</label>
+                <input id="cfg-api-note" type="text" placeholder="VD: Server VPS HCM — huynhty.proxydaphien.ltd"
+                  class="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-sm" />
+              </div>
+
+              <div class="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-800">
+                <div id="cfg-saved-time" class="text-xs text-slate-400"></div>
+                <button onclick="saveApiConfig()"
+                  class="px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary/90 shadow-lg shadow-primary/20 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-lg">save</span> Lưu cấu hình
+                </button>
+              </div>
+
+            </div>
+
+            <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800 p-5">
+              <p class="text-sm font-bold text-blue-700 dark:text-blue-300 mb-2 flex items-center gap-2"><span
+                  class="material-symbols-outlined text-lg">info</span> Cách hoạt động</p>
+              <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-1.5 list-disc list-inside">
+                <li>URL này được lưu trên Firebase, tất cả user sẽ nhận được tự động</li>
+                <li>Khi user mở tab API, ứng dụng tự điền URL và kết nối</li>
+                <li>User chỉ cần tạo Token → nhận link xoay IP ngay</li>
+                <li>Nếu thay đổi server, chỉ cần sửa URL ở đây, không cần cập nhật app</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- USER MODAL -->
+  <div id="user-modal"
+    class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden">
+    <div
+      class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+        <h3 id="user-modal-title" class="text-lg font-bold flex items-center gap-2"><span
+            class="material-symbols-outlined text-primary">person_add</span> Thêm User</h3>
+      </div>
+      <div class="p-6 space-y-4">
+        <input id="edit-user-id" type="hidden" />
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Họ và tên *</label>
+            <input id="u-name" type="text"
+              class="w-full mt-1 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm"
+              required />
+          </div>
+          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Email *</label>
+            <input id="u-email" type="email"
+              class="w-full mt-1 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm"
+              required />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Mật khẩu <span id="pw-hint"
+                class="text-slate-400">(bắt buộc)</span></label>
+            <input id="u-password" type="password"
+              class="w-full mt-1 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm" />
+          </div>
+          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Role</label>
+            <select id="u-role"
+              class="w-full mt-1 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm">
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Số điện thoại</label>
+            <input id="u-phone" type="text"
+              class="w-full mt-1 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm" />
+          </div>
+          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Quốc gia</label>
+            <input id="u-country" type="text"
+              class="w-full mt-1 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm" />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-wider">License Key</label>
+            <input id="u-license" type="text"
+              class="w-full mt-1 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm" />
+          </div>
+          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Gói</label>
+            <select id="u-tier"
+              class="w-full mt-1 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm">
+              <option value="personal">Personal (P)</option>
+              <option value="business">Business (B)</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Trạng thái</label>
+            <select id="u-active"
+              class="w-full mt-1 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm">
+              <option value="true">Hoạt động</option>
+              <option value="false">Khóa</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="p-6 border-t border-slate-200 dark:border-slate-700 flex gap-3">
+        <button onclick="closeUserModal()"
+          class="flex-1 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-bold">Hủy</button>
+        <button onclick="saveUser()"
+          class="flex-1 py-2.5 bg-primary text-white rounded-lg text-sm font-bold">Lưu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- USER DETAIL MODAL -->
+  <div id="detail-modal"
+    class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden">
+    <div
+      class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+        <h3 class="text-lg font-bold flex items-center gap-2"><span
+            class="material-symbols-outlined text-primary">person</span> Chi tiết User</h3>
+        <button onclick="document.getElementById('detail-modal').classList.add('hidden')"
+          class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg"><span
+            class="material-symbols-outlined">close</span></button>
+      </div>
+      <div id="detail-content" class="p-6">Đang tải...</div>
+    </div>
+  </div>
+
+  <!-- KEY MODAL -->
+  <div id="key-modal"
+    class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+      <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+        <h3 class="text-lg font-bold flex items-center gap-2"><span
+            class="material-symbols-outlined text-amber-500">vpn_key</span> Tạo License Key</h3>
+      </div>
+      <div class="p-6 space-y-4">
+        <div><label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Loại gói</label>
+          <select id="k-tier" onchange="toggleKeyExpiry()"
+            class="w-full mt-1 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm">
+            <option value="personal">Personal — 1 router, vĩnh viễn</option>
+            <option value="business">Business — Multi router, vĩnh viễn</option>
+            <option value="test">Test — Chọn ngày hết hạn</option>
+          </select>
+        </div>
+        <div id="k-expiry-wrap" class="hidden"><label
+            class="text-xs font-bold text-slate-500 uppercase tracking-wider">Ngày hết hạn (chỉ gói Test)</label>
+          <input id="k-expires" type="date"
+            class="w-full mt-1 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm" />
+        </div>
+        <div><label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Key (tùy chọn, để trống = tự
+            tạo)</label>
+          <input id="k-key" type="text"
+            class="w-full mt-1 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm font-mono"
+            placeholder="VD: HTP-XXXX-XXXX-XXXX" />
+        </div>
+        <div><label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Gán cho User (tùy chọn)</label>
+          <select id="k-user"
+            class="w-full mt-1 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm">
+            <option value="">— Chưa gán —</option>
+          </select>
+        </div>
+      </div>
+      <div class="p-6 border-t border-slate-200 dark:border-slate-700 flex gap-3">
+        <button onclick="document.getElementById('key-modal').classList.add('hidden')"
+          class="flex-1 py-2.5 bg-slate-100 dark:bg-slate-700 rounded-lg text-sm font-bold">Hủy</button>
+        <button onclick="createKey()" class="flex-1 py-2.5 bg-primary text-white rounded-lg text-sm font-bold">Tạo
+          Key</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://127.0.0.1:8000/api';
+    const H = { 'Content-Type': 'application/json' };
+    let _users = [], _keys = [], _searchTimer = null;
+
+    function enc(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+    let _toastTimer = null;
+    function showToast(type, title, msg) {
+      clearTimeout(_toastTimer);
+      const toast = document.getElementById('toast');
+      const inner = document.getElementById('toast-inner');
+      const icon = document.getElementById('toast-icon');
+      document.getElementById('toast-title').textContent = title;
+      document.getElementById('toast-msg').textContent = msg;
+      inner.className = 'flex items-start gap-3 px-5 py-4 rounded-xl shadow-2xl border max-w-sm ';
+      if (type === 'success') { inner.className += 'bg-emerald-50 border-emerald-200 text-emerald-800'; icon.textContent = 'check_circle'; }
+      else if (type === 'error') { inner.className += 'bg-red-50 border-red-200 text-red-800'; icon.textContent = 'error'; }
+      else { inner.className += 'bg-amber-50 border-amber-200 text-amber-800'; icon.textContent = 'warning'; }
+      toast.classList.remove('hidden');
+      _toastTimer = setTimeout(() => toast.classList.add('hidden'), 4000);
+    }
+
+    function switchTab(tab) {
+      // Ẩn tất cả tab
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+
+      // Hiện tab được chọn (nếu tồn tại)
+      const tabEl = document.getElementById('tab-' + tab);
+      if (tabEl) tabEl.classList.remove('hidden');
+
+      // Cập nhật trạng thái sidebar
+      document.querySelectorAll('.nav-item').forEach(el => {
+        const label = el.querySelector('span:last-child');
+        if (el.dataset.tab === tab) {
+          el.className = 'nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors bg-primary text-white';
+          if (label) label.className = 'text-sm font-semibold';
+        } else {
+          el.className = 'nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800';
+          if (label) label.className = 'text-sm font-medium';
+        }
+      });
+
+      // Đổi tiêu đề
+      document.getElementById('page-title').textContent =
+        ({ dashboard: 'Tổng quan', users: 'Quản lý User', keys: 'License Keys', config: 'Cấu hình API' }[tab] || tab);
+
+      // Tự load dữ liệu cho tab
+      if (tab === 'dashboard') loadStats();
+      else if (tab === 'users') loadUsers();
+      else if (tab === 'keys') loadKeys();
+      else if (tab === 'config') loadApiConfig();
+    }
+
+    async function apiFetch(url, opts = {}) {
+      const res = await fetch(url, { ...opts, headers: { ...H, ...opts.headers } });
+      if (!res.ok) {
+        let msg = 'HTTP ' + res.status;
+        try { const e = await res.json(); if (e.detail) msg = typeof e.detail === 'string' ? e.detail : JSON.stringify(e.detail); } catch (_) { }
+        throw new Error(msg);
+      }
+      return res;
+    }
+
+    // ---------- Dashboard ----------
+
+    async function loadStats() {
+      try {
+        const data = await (await apiFetch(API + '/admin/stats')).json();
+        document.getElementById('stat-total').textContent = data.total_users;
+        document.getElementById('stat-active').textContent = data.active_users;
+        document.getElementById('stat-keys').textContent = data.total_license_keys;
+        document.getElementById('stat-mikrotik').textContent = data.users_with_mikrotik;
+        const tbody = document.getElementById('recent-logins');
+        if (!data.recent_logins || data.recent_logins.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-sm text-slate-400">Chưa có dữ liệu</td></tr>';
+        } else {
+          tbody.innerHTML = data.recent_logins.map(l => {
+            const time = l.login_at ? new Date(l.login_at).toLocaleString('vi-VN') : '';
+            return '<tr class="text-sm"><td class="px-6 py-3 font-mono text-xs text-slate-600">' + enc(l.user_id).substring(0, 12) + '...</td>' +
+              '<td class="px-6 py-3 font-mono text-xs">' + enc(l.ip_address || '—') + '</td>' +
+              '<td class="px-6 py-3 text-xs text-slate-500">' + enc(l.location || '—') + '</td>' +
+              '<td class="px-6 py-3 text-xs text-slate-500 max-w-[200px] truncate">' + enc(l.device || 'N/A') + '</td>' +
+              '<td class="px-6 py-3 text-xs text-slate-500">' + enc(time) + '</td></tr>';
+          }).join('');
+        }
+      } catch (e) { showToast('error', 'Lỗi tải stats', e.message); }
+    }
+
+    // ---------- Users ----------
+
+    function debounceSearch() { clearTimeout(_searchTimer); _searchTimer = setTimeout(() => loadUsers(), 400); }
+
+    async function loadUsers() {
+      const search = (document.getElementById('user-search')?.value || '').trim();
+      try {
+        const url = API + '/admin/users?limit=200' + (search ? '&search=' + encodeURIComponent(search) : '');
+        _users = await (await apiFetch(url)).json();
+        renderUserTable();
+      } catch (e) { showToast('error', 'Lỗi', e.message); }
+    }
+
+    function renderUserTable() {
+      const tbody = document.getElementById('user-tbody');
+      if (_users.length === 0) { tbody.innerHTML = '<tr><td colspan="9" class="px-6 py-12 text-center text-slate-400 text-sm">Không có user nào</td></tr>'; document.getElementById('user-count-text').textContent = '0 user'; return; }
+      tbody.innerHTML = _users.map((u, i) => {
+        const lastLogin = u.last_login_at ? new Date(u.last_login_at).toLocaleString('vi-VN') : 'Chưa đăng nhập';
+        return '<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">' +
+          '<td class="px-4 py-3 text-xs text-slate-400">' + (i + 1) + '</td>' +
+          '<td class="px-4 py-3"><div class="flex items-center gap-2"><div class="size-8 rounded-full flex items-center justify-center text-xs font-bold ' + (u.role === 'admin' ? 'bg-red-100 text-red-600' : 'bg-primary/10 text-primary') + '">' + enc((u.full_name || '?').charAt(0).toUpperCase()) + '</div><span class="text-sm font-semibold">' + enc(u.full_name) + '</span></div></td>' +
+          '<td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">' + enc(u.email) + '</td>' +
+          '<td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase ' + (u.role === 'admin' ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-600') + '">' + enc(u.role) + '</span></td>' +
+          '<td class="px-4 py-3 text-xs font-mono"><div class="flex items-center gap-2">' + (u.license_key ? '<span class="text-primary font-bold">' + enc(u.license_key) + '</span>' : '<span class="text-slate-400">—</span>') + '<span class="px-1.5 py-0.5 rounded text-[10px] font-bold ' + (u.license_tier === 'business' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600') + '">' + (u.license_tier === 'business' ? 'B' : 'P') + '</span></div></td>' +
+          '<td class="px-4 py-3">' + (u.mikrotik_host ? '<div class="flex items-center gap-1.5"><span class="size-2 rounded-full ' + (u.mikrotik_connected ? 'bg-emerald-500' : 'bg-slate-300') + '"></span><div><div class="text-xs font-mono font-bold text-blue-600">' + enc(u.mikrotik_host) + '</div>' + (u.mikrotik_identity ? '<div class="text-[10px] text-slate-400">' + enc(u.mikrotik_identity) + '</div>' : '') + '</div></div>' : '<span class="text-xs text-slate-400">—</span>') + '</td>' +
+          '<td class="px-4 py-3"><div class="text-xs text-slate-500">' + enc(lastLogin) + '</div>' + (u.last_login_ip ? '<div class="text-[10px] font-mono text-slate-400">' + enc(u.last_login_ip) + (u.last_login_location ? ' · ' + enc(u.last_login_location) : '') + '</div>' : '') + '</td>' +
+          '<td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase ' + (u.is_active ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600') + '">' + (u.is_active ? 'Active' : 'Locked') + '</span></td>' +
+          '<td class="px-4 py-3 text-right"><div class="flex items-center justify-end gap-1">' +
+          '<button onclick="viewUserDetail(\'' + enc(u.id) + '\')" class="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg" title="Chi tiết"><span class="material-symbols-outlined text-[18px]">visibility</span></button>' +
+          '<button onclick="editUser(\'' + enc(u.id) + '\')" class="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg" title="Sửa"><span class="material-symbols-outlined text-[18px]">edit</span></button>' +
+          '<button onclick="deleteUser(\'' + enc(u.id) + '\')" class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg" title="Xóa"><span class="material-symbols-outlined text-[18px]">delete</span></button>' +
+          '</div></td></tr>';
+      }).join('');
+      document.getElementById('user-count-text').textContent = _users.length + ' user';
+    }
+
+    function openUserModal() {
+      document.getElementById('edit-user-id').value = '';
+      document.getElementById('u-name').value = '';
+      document.getElementById('u-email').value = '';
+      document.getElementById('u-password').value = '';
+      document.getElementById('u-role').value = 'user';
+      document.getElementById('u-phone').value = '';
+      document.getElementById('u-country').value = '';
+      document.getElementById('u-license').value = '';
+      document.getElementById('u-tier').value = 'personal';
+      document.getElementById('u-active').value = 'true';
+      document.getElementById('user-modal-title').innerHTML = '<span class="material-symbols-outlined text-primary">person_add</span> Thêm User';
+      document.getElementById('pw-hint').textContent = '(bắt buộc)';
+      document.getElementById('u-password').required = true;
+      document.getElementById('user-modal').classList.remove('hidden');
+    }
+    function closeUserModal() { document.getElementById('user-modal').classList.add('hidden'); }
+
+    function editUser(userId) {
+      const u = _users.find(x => x.id === userId);
+      if (!u) return;
+      document.getElementById('edit-user-id').value = u.id;
+      document.getElementById('u-name').value = u.full_name || '';
+      document.getElementById('u-email').value = u.email || '';
+      document.getElementById('u-password').value = '';
+      document.getElementById('u-role').value = u.role || 'user';
+      document.getElementById('u-phone').value = u.phone || '';
+      document.getElementById('u-country').value = u.country || '';
+      document.getElementById('u-license').value = u.license_key || '';
+      document.getElementById('u-tier').value = (u.license_tier === 'business' ? 'business' : 'personal');
+      document.getElementById('u-active').value = u.is_active ? 'true' : 'false';
+      document.getElementById('user-modal-title').innerHTML = '<span class="material-symbols-outlined text-amber-500">edit</span> Sửa User';
+      document.getElementById('pw-hint').textContent = '(để trống = giữ nguyên)';
+      document.getElementById('u-password').required = false;
+      document.getElementById('user-modal').classList.remove('hidden');
+    }
+
+    async function saveUser() {
+      const userId = document.getElementById('edit-user-id').value;
+      const isEdit = !!userId;
+      const name = document.getElementById('u-name').value.trim();
+      const email = document.getElementById('u-email').value.trim();
+      const password = document.getElementById('u-password').value;
+      const role = document.getElementById('u-role').value;
+      const phone = document.getElementById('u-phone').value.trim();
+      const country = document.getElementById('u-country').value.trim();
+      const license = document.getElementById('u-license').value.trim();
+      const isActive = document.getElementById('u-active').value === 'true';
+      if (!name || !email) { showToast('error', 'Thiếu thông tin', 'Nhập họ tên và email'); return; }
+      if (!isEdit && !password) { showToast('error', 'Thiếu mật khẩu', 'Nhập mật khẩu cho user mới'); return; }
+      try {
+        let url, method, body;
+        if (isEdit) {
+          url = API + '/admin/users/' + userId; method = 'PUT';
+          body = { full_name: name, email, role, phone, country, license_key: license, license_tier: document.getElementById('u-tier').value, is_active: isActive };
+          if (password) body.password = password;
+        } else {
+          url = API + '/admin/users'; method = 'POST';
+          body = { full_name: name, email, password, role, is_active: isActive };
+        }
+        await apiFetch(url, { method, body: JSON.stringify(body) });
+        showToast('success', isEdit ? 'Đã cập nhật' : 'Đã tạo', name);
+        closeUserModal(); loadUsers(); loadStats();
+      } catch (e) { showToast('error', 'Lỗi', e.message); }
+    }
+
+    async function deleteUser(userId) {
+      const u = _users.find(x => x.id === userId);
+      if (!confirm('Xóa user "' + (u?.full_name || userId) + '"?')) return;
+      try {
+        await apiFetch(API + '/admin/users/' + userId, { method: 'DELETE' });
+        showToast('success', 'Đã xóa', u?.full_name || userId); loadUsers(); loadStats();
+      } catch (e) { showToast('error', 'Lỗi xóa', e.message); }
+    }
+
+    async function viewUserDetail(userId) {
+      const modal = document.getElementById('detail-modal');
+      const content = document.getElementById('detail-content');
+      modal.classList.remove('hidden');
+      content.innerHTML = '<div class="text-center py-8 text-slate-400">Đang tải...</div>';
+      let _detailUserId = userId;
+      let _loginLimit = 20, _mkLimit = 20;
+      try {
+        const [userRes, historyRes, mkHistRes] = await Promise.all([
+          apiFetch(API + '/admin/users/' + userId),
+          apiFetch(API + '/admin/users/' + userId + '/login-history?limit=100').catch(() => null),
+          apiFetch(API + '/admin/users/' + userId + '/mikrotik-history?limit=100').catch(() => null),
+        ]);
+        const user = await userRes.json();
+        const history = historyRes ? await historyRes.json() : [];
+        const mkHistory = mkHistRes ? await mkHistRes.json() : [];
+
+        function renderLoginRows(list, limit) {
+          if (list.length === 0) return '<tr><td colspan="5" class="px-4 py-4 text-center text-xs text-slate-400">Chưa có</td></tr>';
+          const shown = limit ? list.slice(0, limit) : list;
+          return shown.map(h => '<tr class="text-xs"><td class="px-4 py-2 max-w-[150px] truncate">' + enc(h.device || 'N/A') + '</td><td class="px-4 py-2 font-mono">' + enc(h.ip_address || '—') + '</td><td class="px-4 py-2 text-slate-500">' + enc(h.location || '—') + '</td><td class="px-4 py-2 text-slate-500">' + (h.login_at ? new Date(h.login_at).toLocaleString('vi-VN') : '') + '</td><td class="px-4 py-2"><span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase ' + (h.status === 'success' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600') + '">' + (h.status === 'success' ? 'OK' : 'Fail') + '</span></td></tr>').join('');
+        }
+        function renderMkRows(list, limit) {
+          if (list.length === 0) return '<tr><td colspan="6" class="px-4 py-4 text-center text-xs text-slate-400">Chưa có</td></tr>';
+          const shown = limit ? list.slice(0, limit) : list;
+          return shown.map(m => '<tr class="text-xs"><td class="px-4 py-2"><span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase ' + (m.action === 'connect' ? 'bg-emerald-100 text-emerald-600' : 'bg-orange-100 text-orange-600') + '">' + (m.action === 'connect' ? 'Kết nối' : 'Ngắt') + '</span></td><td class="px-4 py-2 font-mono font-bold text-blue-600">' + enc(m.host || '—') + '</td><td class="px-4 py-2">' + enc(m.identity || '—') + '</td><td class="px-4 py-2">' + enc(m.version || '—') + '</td><td class="px-4 py-2">' + enc(m.uptime || '—') + '</td><td class="px-4 py-2 text-slate-500">' + (m.timestamp ? new Date(m.timestamp).toLocaleString('vi-VN') : '') + '</td></tr>').join('');
+        }
+
+        content.innerHTML = `
+      <div class="space-y-6">
+        <div class="flex items-center gap-4 pb-4 border-b border-slate-200 dark:border-slate-700">
+          <div class="size-16 rounded-full flex items-center justify-center text-2xl font-black ${user.role === 'admin' ? 'bg-red-100 text-red-600' : 'bg-primary/10 text-primary'}">${enc((user.full_name || '?').charAt(0).toUpperCase())}</div>
+          <div><h3 class="text-xl font-bold">${enc(user.full_name)}</h3><p class="text-sm text-slate-500">${enc(user.email)}</p>
+            <div class="flex gap-2 mt-1"><span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${user.role === 'admin' ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-600'}">${enc(user.role)}</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${user.is_active ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}">${user.is_active ? 'Active' : 'Locked'}</span></div></div></div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-slate-50 dark:bg-slate-700/30 rounded-lg p-3"><p class="text-[10px] font-black text-slate-400 uppercase">SĐT</p><p class="text-sm font-medium mt-0.5">${enc(user.phone || '—')}</p></div>
+          <div class="bg-slate-50 dark:bg-slate-700/30 rounded-lg p-3"><p class="text-[10px] font-black text-slate-400 uppercase">Quốc gia</p><p class="text-sm font-medium mt-0.5">${enc(user.country || '—')}</p></div>
+          <div class="bg-slate-50 dark:bg-slate-700/30 rounded-lg p-3"><p class="text-[10px] font-black text-slate-400 uppercase">License Key</p><p class="text-sm font-mono font-bold mt-0.5 ${user.license_key ? 'text-primary' : 'text-slate-400'}">${enc(user.license_key || 'Chưa kích hoạt')}</p></div>
+          <div class="bg-slate-50 dark:bg-slate-700/30 rounded-lg p-3"><p class="text-[10px] font-black text-slate-400 uppercase">Ngày tạo</p><p class="text-sm font-medium mt-0.5">${user.created_at ? new Date(user.created_at).toLocaleString('vi-VN') : '—'}</p></div>
+        </div>
+        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="text-xs font-black text-blue-600 uppercase flex items-center gap-1"><span class="material-symbols-outlined text-sm">router</span> MikroTik</h4>
+            ${user.mikrotik_host ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase ' + (user.mikrotik_connected ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-500') + '">' + (user.mikrotik_connected ? 'Online' : 'Offline') + '</span>' : '<span class="text-[10px] text-slate-400">Chưa kết nối</span>'}
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <div><p class="text-[10px] text-blue-400 font-bold">Host</p><p class="text-sm font-mono font-bold">${enc(user.mikrotik_host || '—')}</p></div>
+            <div><p class="text-[10px] text-blue-400 font-bold">Username</p><p class="text-sm font-mono font-bold">${enc(user.mikrotik_username || '—')}</p></div>
+            <div><p class="text-[10px] text-blue-400 font-bold">Password</p><p class="text-sm font-mono font-bold">${enc(user.mikrotik_password || '—')}</p></div>
+            <div><p class="text-[10px] text-blue-400 font-bold">Identity</p><p class="text-sm font-bold">${enc(user.mikrotik_identity || '—')}</p></div>
+            <div><p class="text-[10px] text-blue-400 font-bold">RouterOS</p><p class="text-sm font-bold">${enc(user.mikrotik_version || '—')}</p></div>
+            <div><p class="text-[10px] text-blue-400 font-bold">Uptime</p><p class="text-sm font-bold">${enc(user.mikrotik_uptime || '—')}</p></div>
+          </div>
+          ${user.mikrotik_connected_at ? '<p class="text-[10px] text-blue-400 mt-2">Kết nối lúc: ' + new Date(user.mikrotik_connected_at).toLocaleString('vi-VN') + '</p>' : ''}
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="text-xs font-black text-slate-400 uppercase">Lịch sử đăng nhập <span class="text-slate-300 font-normal">(${history.length})</span></h4>
+            ${history.length > _loginLimit ? '<button id="btn-login-all" class="text-[10px] font-bold text-primary hover:underline">Xem tất cả</button>' : ''}
+          </div>
+          <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700 max-h-[300px] overflow-y-auto"><table class="w-full text-left"><thead class="sticky top-0"><tr class="text-[10px] font-black text-slate-400 uppercase bg-slate-50 dark:bg-slate-700/50">
+            <th class="px-4 py-2">Thiết bị</th><th class="px-4 py-2">IP</th><th class="px-4 py-2">Vị trí</th><th class="px-4 py-2">Thời gian</th><th class="px-4 py-2">Trạng thái</th>
+          </tr></thead><tbody id="detail-login-tbody" class="divide-y divide-slate-100 dark:divide-slate-700">
+            ${renderLoginRows(history, _loginLimit)}
+          </tbody></table></div>
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="text-xs font-black text-slate-400 uppercase flex items-center gap-1"><span class="material-symbols-outlined text-sm">router</span> Lịch sử kết nối MikroTik <span class="text-slate-300 font-normal">(${mkHistory.length})</span></h4>
+            ${mkHistory.length > _mkLimit ? '<button id="btn-mk-all" class="text-[10px] font-bold text-primary hover:underline">Xem tất cả</button>' : ''}
+          </div>
+          <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700 max-h-[300px] overflow-y-auto"><table class="w-full text-left"><thead class="sticky top-0"><tr class="text-[10px] font-black text-slate-400 uppercase bg-slate-50 dark:bg-slate-700/50">
+            <th class="px-4 py-2">Hành động</th><th class="px-4 py-2">Host</th><th class="px-4 py-2">Identity</th><th class="px-4 py-2">RouterOS</th><th class="px-4 py-2">Uptime</th><th class="px-4 py-2">Thời gian</th>
+          </tr></thead><tbody id="detail-mk-tbody" class="divide-y divide-slate-100 dark:divide-slate-700">
+            ${renderMkRows(mkHistory, _mkLimit)}
+          </tbody></table></div>
+        </div>
+        <div class="bg-slate-50 dark:bg-slate-700/30 rounded-xl p-4">
+          <p class="text-[10px] text-slate-400 font-bold">User ID</p><p class="text-xs font-mono text-slate-500">${enc(user.id)}</p></div>
+      </div>`;
+
+        document.getElementById('btn-login-all')?.addEventListener('click', () => {
+          document.getElementById('detail-login-tbody').innerHTML = renderLoginRows(history, 0);
+          document.getElementById('btn-login-all').remove();
+        });
+        document.getElementById('btn-mk-all')?.addEventListener('click', () => {
+          document.getElementById('detail-mk-tbody').innerHTML = renderMkRows(mkHistory, 0);
+          document.getElementById('btn-mk-all').remove();
+        });
+      } catch (e) { content.innerHTML = '<div class="text-center py-8 text-red-500">Lỗi: ' + enc(e.message) + '</div>'; }
+    }
+
+    // ---------- License Keys ----------
+
+    async function loadKeys() {
+      try { _keys = await (await apiFetch(API + '/admin/license-keys')).json(); renderKeyTable(); }
+      catch (e) { showToast('error', 'Lỗi', e.message); }
+    }
+
+    function renderKeyTable() {
+      const tbody = document.getElementById('key-tbody');
+      if (_keys.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-12 text-center text-slate-400 text-sm">Chưa có key nào</td></tr>'; return; }
+      tbody.innerHTML = _keys.map(k => {
+        const created = k.created_at ? new Date(k.created_at).toLocaleString('vi-VN') : '';
+        const expires = k.expires_at ? new Date(k.expires_at).toLocaleDateString('vi-VN') : 'Vĩnh viễn';
+        const tier = (k.tier || 'personal').toLowerCase();
+        const tierBadge = tier === 'business' ? '<span class="px-2 py-0.5 rounded text-[10px] font-black bg-violet-100 text-violet-600">Business</span>' :
+          tier === 'test' ? '<span class="px-2 py-0.5 rounded text-[10px] font-black bg-amber-100 text-amber-600">Test</span>' :
+            '<span class="px-2 py-0.5 rounded text-[10px] font-black bg-slate-100 text-slate-600">Personal</span>';
+        return '<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">' +
+          '<td class="px-4 py-3"><span class="font-mono text-sm font-bold text-primary">' + enc(k.key) + '</span>' +
+          '<button onclick="navigator.clipboard.writeText(\'' + enc(k.key).replace(/'/g, "\\'") + '\');showToast(\'success\',\'Copied\',\'Key đã copy\')" class="ml-2 text-slate-400 hover:text-primary"><span class="material-symbols-outlined text-sm align-middle">content_copy</span></button></td>' +
+          '<td class="px-4 py-3">' + tierBadge + '</td>' +
+          '<td class="px-4 py-3 text-sm text-slate-500">' + enc(expires) + '</td>' +
+          '<td class="px-4 py-3 text-xs font-mono text-slate-500">' + (k.user_id ? enc(k.user_id).substring(0, 12) + '...' : '<span class="text-slate-400">—</span>') + '</td>' +
+          '<td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase ' + (k.is_used ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600') + '">' + (k.is_used ? 'Đã dùng' : 'Chưa dùng') + '</span></td>' +
+          '<td class="px-4 py-3 text-xs text-slate-500">' + enc(created) + '</td>' +
+          '<td class="px-4 py-3 text-right"><button onclick="deleteKey(\'' + enc(k.id) + '\')" class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg" title="Xóa"><span class="material-symbols-outlined text-[18px]">delete</span></button></td></tr>';
+      }).join('');
+    }
+
+    function toggleKeyExpiry() {
+      const tier = document.getElementById('k-tier').value;
+      const wrap = document.getElementById('k-expiry-wrap');
+      if (tier === 'test') {
+        wrap.classList.remove('hidden');
+        const d = new Date();
+        d.setDate(d.getDate() + 30);
+        document.getElementById('k-expires').value = d.toISOString().slice(0, 10);
+      } else {
+        wrap.classList.add('hidden');
+      }
+    }
+
+    function openKeyModal() {
+      const sel = document.getElementById('k-user');
+      sel.innerHTML = '<option value="">— Chưa gán —</option>';
+      _users.forEach(u => { const o = document.createElement('option'); o.value = u.id; o.textContent = (u.full_name || u.email) + ' (' + u.email + ')'; sel.appendChild(o); });
+      document.getElementById('k-tier').value = 'personal';
+      toggleKeyExpiry();
+      document.getElementById('key-modal').classList.remove('hidden');
+    }
+
+    async function createKey() {
+      const key = document.getElementById('k-key').value.trim();
+      const tier = document.getElementById('k-tier').value || 'personal';
+      const expiresVal = document.getElementById('k-expires').value;
+      const userId = document.getElementById('k-user').value.trim();
+      try {
+        const body = { tier };
+        if (key) body.key = key;
+        if (userId) body.user_id = userId;
+        if (tier === 'test' && expiresVal) {
+          body.expires_at = new Date(expiresVal).toISOString();
+        } else if (tier === 'test') {
+          body.duration_days = 30;
+        }
+        const data = await (await apiFetch(API + '/admin/license-keys', { method: 'POST', body: JSON.stringify(body) })).json();
+        showToast('success', 'Đã tạo key', data.key + ' (' + tier + ')');
+        document.getElementById('key-modal').classList.add('hidden');
+        document.getElementById('k-key').value = '';
+        document.getElementById('k-tier').value = 'personal';
+        loadKeys(); loadStats();
+      } catch (e) { showToast('error', 'Lỗi', e.message); }
+    }
+
+    async function deleteKey(keyId) {
+      if (!confirm('Xóa license key này?')) return;
+      try { await apiFetch(API + '/admin/license-keys/' + keyId, { method: 'DELETE' }); showToast('success', 'Đã xóa', 'Key đã bị xóa'); loadKeys(); loadStats(); }
+      catch (e) { showToast('error', 'Lỗi', e.message); }
+    }
+
+    // ── API Config ──
+    async function loadApiConfig() {
+      try {
+        const res = await apiFetch(API + '/admin/app-config');
+        const data = await res.json();
+        document.getElementById('cfg-api-url').value = data.api_server_url || '';
+        document.getElementById('cfg-mk-port').value = data.mikrotik_api_port || 3544;
+        document.getElementById('cfg-api-note').value = data.api_server_note || '';
+        if (data.updated_at) {
+          document.getElementById('cfg-saved-time').textContent = 'Cập nhật lần cuối: ' + new Date(data.updated_at).toLocaleString('vi');
+        }
+      } catch (_) { }
+    }
+
+    async function saveApiConfig() {
+      const url = document.getElementById('cfg-api-url').value.trim().replace(/\/+$/, '');
+      const port = parseInt(document.getElementById('cfg-mk-port').value) || 3544;
+      const note = document.getElementById('cfg-api-note').value.trim();
+      if (!url) { showToast('error', 'Lỗi', 'Nhập URL API server'); return; }
+      try {
+        await apiFetch(API + '/admin/app-config', {
+          method: 'PUT',
+          body: JSON.stringify({ api_server_url: url, mikrotik_api_port: port, api_server_note: note }),
+        });
+        showToast('success', 'Đã lưu', 'Cấu hình đã được cập nhật cho tất cả user');
+        loadApiConfig();
+      } catch (e) { showToast('error', 'Lỗi', e.message); }
+    }
+
+    async function testApiUrl() {
+      const url = document.getElementById('cfg-api-url').value.trim().replace(/\/+$/, '');
+      if (!url) return;
+      const st = document.getElementById('cfg-api-status');
+      st.innerHTML = '<span class="text-amber-500">Đang test...</span>';
+      try {
+        const res = await fetch(url + '/', { signal: AbortSignal.timeout(5000) });
+        const data = await res.json();
+        if (data.service) {
+          st.innerHTML = '<span class="text-emerald-500 font-bold">✓ Kết nối thành công — ' + data.service + ' v' + data.version + '</span>';
+        } else {
+          st.innerHTML = '<span class="text-red-500">✗ Server phản hồi nhưng không đúng format</span>';
+        }
+      } catch (e) {
+        st.innerHTML = '<span class="text-red-500">✗ Không kết nối được: ' + e.message + '</span>';
+      }
+    }
+
+    // Init
+    loadStats(); loadUsers(); loadKeys();
+  </script>
+</body>
+
+</html>

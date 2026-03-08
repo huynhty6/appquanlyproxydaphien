@@ -1,0 +1,3183 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HT Proxy - Bảng điều khiển</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1349ec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101522",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .tier-badge { transform-origin: center; }
+        .tier-badge:hover { transform: scale(1.05); }
+        .tier-personal:hover { box-shadow: 0 4px 14px rgba(100, 116, 139, 0.45); }
+        .tier-business:hover { box-shadow: 0 4px 14px rgba(139, 92, 246, 0.5); }
+        .tier-test:hover { box-shadow: 0 4px 14px rgba(245, 158, 11, 0.5); }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<script>if(location.search.includes('embed=1')){document.write('<style>aside{display:none!important}.max-w-5xl,.max-w-6xl,.max-w-7xl{max-width:100%!important}</style>');}</script>
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar - Based on SCREEN_19 -->
+<aside class="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark flex flex-col">
+<div class="p-6 flex items-center gap-3">
+<div class="size-10 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-2xl">shield_person</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-lg font-bold leading-tight tracking-tight text-slate-900 dark:text-white">HT Proxy</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium">v2.6.0 Professional</p>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto px-4 py-2 space-y-1 custom-scrollbar"><div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[22px]">dashboard</span>
+<span class="text-sm font-medium">Bảng điều khiển</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-primary hover:bg-slate-100 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined text-[22px]">settings</span>
+<span class="text-sm font-semibold">Cấu hình hệ thống</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[22px]">history</span>
+<span class="text-sm font-medium">Lịch sử xoay</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[22px]">description</span>
+<span class="text-sm font-medium">Nhật ký</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[22px]">person_add</span>
+<span class="text-sm font-medium">Gán Proxy</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[22px]">verified_user</span>
+<span class="text-sm font-medium">Kiểm tra Proxy</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[22px]">account_circle</span>
+<span class="text-sm font-medium">Hồ sơ</span>
+</div>
+<div class="pt-4 pb-2">
+<p class="px-3 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Hỗ trợ &amp; Tài liệu</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[22px]">mail</span>
+<span class="text-sm font-medium">Liên hệ</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[22px]">info</span>
+<span class="text-sm font-medium">Giới thiệu</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[22px]">menu_book</span>
+<span class="text-sm font-medium">Hướng dẫn</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[22px]">code</span>
+<span class="text-sm font-medium">API</span>
+</div></nav>
+<div class="p-4 mt-auto">
+<button class="w-full py-2.5 bg-primary/10 dark:bg-primary/20 text-primary rounded-lg text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined text-lg">upgrade</span>
+<span>Nâng cấp Gói</span>
+</button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col overflow-hidden">
+
+<!-- Header -->
+<header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark flex items-center justify-between px-8">
+<div class="flex items-center gap-4">
+<h2 class="text-xl font-bold" style="">Danh sách Proxy</h2>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl" style="">search</span>
+<input id="search-proxy" oninput="filterProxyTable(this.value)" class="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm w-64 focus:ring-2 focus:ring-primary/50 transition-all" placeholder="Tìm kiếm IP, tên router, domain..." type="text"/>
+</div>
+<button class="size-10 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" style="">
+<span class="material-symbols-outlined" style="">notifications</span>
+</button>
+<button id="header-status" class="bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all">Chưa kết nối</button>
+<button id="btn-multi-toggle" onclick="toggleMultiRouter()" class="px-3 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm">
+<span class="material-symbols-outlined text-base">hub</span> Multi
+</button>
+<div class="h-8 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<div class="flex items-center gap-2.5 cursor-pointer group" onclick="window.parent?.postMessage('ht_go_profile','*')">
+<div class="text-right hidden sm:block">
+<div class="flex items-center justify-end gap-1.5">
+<p id="header-user-name" class="text-sm font-bold truncate max-w-[120px]">...</p>
+<span id="header-tier-badge" class="tier-badge tier-personal shrink-0 px-2 py-1 rounded-lg text-[9px] font-bold transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-default bg-gradient-to-r from-slate-400 to-slate-600 text-white shadow-md" title="Personal">Personal</span>
+</div>
+<p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Người dùng</p>
+</div>
+<div class="size-9 rounded-full bg-primary/20 overflow-hidden border-2 border-transparent group-hover:border-primary transition-all">
+<img src="../logouser.png" alt="Avatar" class="w-full h-full object-cover">
+</div>
+</div>
+<button onclick="window.parent?.document.getElementById('btn-logout')?.click()" class="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors" title="Đăng xuất">
+<span class="material-symbols-outlined text-xl">logout</span>
+</button>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="flex-1 overflow-y-auto p-8 space-y-8">
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<div class="p-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg">
+<span class="material-symbols-outlined" style="">public</span>
+</div>
+<span class="text-xs font-bold text-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded-full" style="">+12%</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium" style="">Tổng số Proxy</p>
+<h3 id="stat-total" class="text-2xl font-black mt-1" style="">0</h3>
+</div>
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<div class="p-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg">
+<span class="material-symbols-outlined" style="">check_circle</span>
+</div>
+<span class="text-xs font-bold text-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded-full" style="">+5%</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium" style="">Đang hoạt động</p>
+<h3 id="stat-online" class="text-2xl font-black mt-1" style="">0</h3>
+</div>
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<div class="p-2 bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-lg">
+<span class="material-symbols-outlined" style="">error</span>
+</div>
+<span class="text-xs font-bold text-rose-500 bg-rose-50 dark:bg-rose-900/30 px-2 py-1 rounded-full" style="">-2%</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium" style="">Ngoại tuyến/Lỗi</p>
+<h3 id="stat-offline" class="text-2xl font-black mt-1" style="">0</h3>
+</div>
+</div>
+<!-- Multi Router Node Panel (hidden until toggled) -->
+<div id="mr-panel" class="hidden">
+<div class="bg-white dark:bg-slate-800 rounded-xl border border-violet-200 dark:border-violet-800 shadow-sm overflow-hidden">
+<div class="px-4 py-2.5 bg-violet-50/50 dark:bg-violet-900/10 border-b border-violet-100 dark:border-violet-800 flex items-center justify-between flex-wrap gap-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-violet-600 text-lg">hub</span>
+<span class="text-xs font-bold text-slate-700 dark:text-white">Multi Router</span>
+<span class="text-[10px] text-slate-400 font-medium" id="mr-stats">0 router</span>
+</div>
+<div class="flex items-center gap-1.5 flex-wrap">
+<button onclick="openAddRouter()" class="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-xs font-bold rounded-lg hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined text-sm">add</span> Thêm
+</button>
+<button onclick="openBatchImport()" class="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-600 border border-emerald-200 text-xs font-bold rounded-lg hover:bg-emerald-100 transition-all">
+<span class="material-symbols-outlined text-sm">playlist_add</span> Nhập
+</button>
+<button onclick="openMrEditModal()" class="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-600 border border-amber-200 text-xs font-bold rounded-lg hover:bg-amber-100 transition-all">
+<span class="material-symbols-outlined text-sm">edit</span> Chỉnh sửa
+</button>
+<button onclick="mrTestAll()" class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-200 text-xs font-bold rounded-lg hover:bg-blue-100 transition-all">
+<span class="material-symbols-outlined text-sm">speed</span> Test
+</button>
+<button onclick="mrConnectAll()" id="btn-connect-all" class="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600 text-white text-xs font-bold rounded-lg hover:bg-violet-700 transition-all shadow-sm">
+<span class="material-symbols-outlined text-sm">bolt</span> Kết nối tất cả
+</button>
+<button onclick="mrDisconnectAll()" id="btn-disconnect-all" class="hidden flex items-center gap-1.5 px-3 py-1.5 bg-red-500 text-white text-xs font-bold rounded-lg hover:bg-red-600 transition-all shadow-sm">
+<span class="material-symbols-outlined text-sm">power_settings_new</span> Ngắt kết nối
+</button>
+<label class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-all">
+<input id="chk-auto-mr" type="checkbox" class="size-3.5 rounded border-slate-300 text-violet-600 focus:ring-violet-500" onchange="saveMrAutoConnect()"/>
+<span class="text-xs font-bold text-slate-600 dark:text-slate-300">Tự động kết nối</span>
+</label>
+</div>
+</div>
+<div class="px-4 py-2.5 flex flex-wrap gap-2 items-center" id="mr-nodes">
+<p class="text-[10px] text-slate-400">Chưa có router</p>
+</div>
+</div>
+</div>
+<!-- Main Table Section -->
+<div id="single-connect-box" class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+<h3 class="font-bold text-lg mb-6" style="">Thông tin kết nối</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+<div class="space-y-2">
+<label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider" style="">HOST</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg" style="">dns</span>
+<input id="mk-host" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="htproxy.cloud" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider" style="">USERNAME</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg" style="">person</span>
+<input id="mk-user" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="admin" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider" style="">PASSWORD</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg" style="">lock</span>
+<input id="mk-pass" class="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all" type="password" placeholder="Mật khẩu"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors" style="">
+<span class="material-symbols-outlined text-lg" style="">visibility</span>
+</button>
+</div>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-6">
+<label class="flex items-center gap-2 cursor-pointer group">
+<input id="chk-save" class="size-4 rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
+<span class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">Lưu đăng nhập</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input id="chk-auto" class="size-4 rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
+<span class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">Tự động kết nối</span>
+</label>
+</div>
+<button id="btn-connect" class="w-full sm:w-auto px-8 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-lg">bolt</span>
+<span id="btn-connect-text">Kết nối</span>
+</button>
+</div>
+</div><div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col max-h-[calc(100vh-12rem)]">
+<div class="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between flex-shrink-0 sticky top-0 z-20 bg-white dark:bg-slate-800">
+<h3 class="font-bold text-lg" style="">Quản lý kết nối</h3>
+<div class="flex items-center gap-2">
+<div class="flex flex-wrap gap-2 mr-2">
+<div class="relative" id="dl-wrap">
+<button onclick="toggleDropdown('dl-menu')" class="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+<span class="material-symbols-outlined text-base">download</span> Tải về <span class="material-symbols-outlined text-xs ml-0.5">expand_more</span>
+</button>
+<div id="dl-menu" class="hidden absolute right-0 top-full mt-1 w-52 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl z-50 py-1 text-xs">
+<button onclick="quickExport('all','download')" class="w-full px-3 py-2 text-left hover:bg-primary/5 font-bold text-primary flex items-center gap-2"><span class="material-symbols-outlined text-sm">select_all</span> Tất cả (Full)</button>
+<button onclick="quickExport('host_http','download')" class="w-full px-3 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"><span class="material-symbols-outlined text-sm">http</span> Host:HTTP</button>
+<button onclick="quickExport('ip_http','download')" class="w-full px-3 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"><span class="material-symbols-outlined text-sm">language</span> IP:HTTP</button>
+<button onclick="quickExport('host_socks','download')" class="w-full px-3 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"><span class="material-symbols-outlined text-sm">shield</span> Host:SOCKS</button>
+<button onclick="quickExport('ip_socks','download')" class="w-full px-3 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"><span class="material-symbols-outlined text-sm">vpn_lock</span> IP:SOCKS</button>
+<button onclick="quickExport('api_rotate','download')" class="w-full px-3 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"><span class="material-symbols-outlined text-sm">api</span> API Rotate</button>
+</div>
+</div>
+<div class="relative" id="cp-wrap">
+<button onclick="toggleDropdown('cp-menu')" class="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+<span class="material-symbols-outlined text-base">content_copy</span> Copy <span class="material-symbols-outlined text-xs ml-0.5">expand_more</span>
+</button>
+<div id="cp-menu" class="hidden absolute right-0 top-full mt-1 w-52 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl z-50 py-1 text-xs">
+<button onclick="quickExport('all','copy')" class="w-full px-3 py-2 text-left hover:bg-primary/5 font-bold text-primary flex items-center gap-2"><span class="material-symbols-outlined text-sm">select_all</span> Tất cả (Full)</button>
+<button onclick="quickExport('host_http','copy')" class="w-full px-3 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"><span class="material-symbols-outlined text-sm">http</span> Host:HTTP</button>
+<button onclick="quickExport('ip_http','copy')" class="w-full px-3 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"><span class="material-symbols-outlined text-sm">language</span> IP:HTTP</button>
+<button onclick="quickExport('host_socks','copy')" class="w-full px-3 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"><span class="material-symbols-outlined text-sm">shield</span> Host:SOCKS</button>
+<button onclick="quickExport('ip_socks','copy')" class="w-full px-3 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"><span class="material-symbols-outlined text-sm">vpn_lock</span> IP:SOCKS</button>
+<button onclick="quickExport('api_rotate','copy')" class="w-full px-3 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"><span class="material-symbols-outlined text-sm">api</span> API Rotate</button>
+</div>
+</div>
+<button onclick="openPwdModal()" class="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+<span class="material-symbols-outlined text-base">key</span>
+            Đổi mật khẩu
+        </button>
+<button onclick="rotateAllIps()" class="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-lg text-xs font-bold hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined text-base">sync</span>
+            Xoay tất cả
+        </button>
+<button id="btn-schedule" onclick="openScheduleModal()" class="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+<span class="material-symbols-outlined text-base">schedule</span>
+<span id="btn-schedule-text">Hẹn giờ xoay</span>
+</button>
+<button id="btn-restart-all" onclick="restartAllContainers()" class="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-lg text-xs font-bold hover:bg-emerald-500 hover:text-white transition-all">
+<span class="material-symbols-outlined text-base">restart_alt</span>
+            Restart Proxy
+        </button>
+<button onclick="disableSelected()" class="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 text-rose-600 border border-rose-200 rounded-lg text-xs font-bold hover:bg-rose-500 hover:text-white transition-all">
+<span class="material-symbols-outlined text-base">block</span>
+            Disable
+        </button>
+<button onclick="enableSelected()" class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg text-xs font-bold hover:bg-blue-500 hover:text-white transition-all">
+<span class="material-symbols-outlined text-base">play_arrow</span>
+            Enable
+        </button>
+</div><button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors" style="">
+<span class="material-symbols-outlined" style="">filter_list</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">
+<th class="pl-4 pr-1 py-4 w-10"><input id="chk-all" type="checkbox" class="size-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer" onchange="toggleAllCheckboxes(this.checked)"/></th>
+<th class="px-4 py-4 font-bold w-14">STT</th>
+<th class="px-4 py-4 font-bold">Thông tin Proxy</th>
+<th class="px-4 py-4 font-bold">Thông tin kết nối</th>
+<th class="px-4 py-4 font-bold">Mật khẩu</th>
+<th class="px-4 py-4 font-bold">Trạng thái</th>
+<th class="px-4 py-4 font-bold text-right">Chức năng</th>
+</tr>
+</thead>
+<tbody id="proxy-tbody" class="divide-y divide-slate-100 dark:divide-slate-700">
+<tr><td colspan="7" class="px-6 py-12 text-center text-slate-400 text-sm">Nhập thông tin kết nối và nhấn "Kết nối" để xem danh sách proxy</td></tr>
+</tbody>
+</table>
+</div>
+<div class="p-6 bg-slate-50 dark:bg-slate-900/50 flex items-center justify-between border-t border-slate-200 dark:border-slate-700">
+<p id="pagination-text" class="text-sm text-slate-500 dark:text-slate-400 font-medium" style="">Chưa có dữ liệu</p>
+</div>
+</div>
+<!-- Usage Map -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8">
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm min-h-[300px] flex flex-col">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-bold text-lg">Vị trí IP đang hoạt động</h3>
+<div class="flex items-center gap-2">
+<span id="map-count" class="text-xs font-medium text-slate-500">0 IP</span>
+<button onclick="refreshMapMarkers()" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 transition" title="Làm mới bản đồ"><span class="material-symbols-outlined text-base">refresh</span></button>
+</div>
+</div>
+<div id="vn-map" class="flex-1 rounded-lg overflow-hidden min-h-[260px]" style="z-index:0"></div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm min-h-[300px]">
+<h3 class="font-bold text-lg mb-4">Thông tin hệ thống</h3>
+<div id="system-info">
+<div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/30 rounded-xl">
+<div class="flex items-center gap-3">
+<div class="size-10 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">router</span>
+</div>
+<div>
+<p class="text-sm font-bold">Chưa kết nối HT Proxy</p>
+<p class="text-xs text-slate-500">Nhập thông tin để kết nối</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+<!-- Upgrade Business Modal (Personal user click Multi) -->
+<div id="upgrade-business-modal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden" onclick="if(event.target===this)this.classList.add('hidden')">
+<div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+<div class="p-6 text-center">
+<div class="size-16 mx-auto mb-4 rounded-2xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-amber-600 dark:text-amber-400">workspace_premium</span>
+</div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Nâng cấp gói Business</h3>
+<p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">Multi Router là tính năng dành cho doanh nghiệp quản lý nhiều router đồng thời. Vui lòng liên hệ để được tư vấn và nâng cấp gói phù hợp.</p>
+<div class="flex flex-col gap-3">
+<a href="https://zalo.me/0823555522" target="_blank" class="flex items-center justify-center gap-2 w-full py-3 bg-[#0068FF] hover:bg-[#0055dd] text-white font-bold rounded-xl transition-colors">
+<span class="material-symbols-outlined text-xl">chat</span> Liên hệ Zalo
+</a>
+<a href="https://www.facebook.com/huynhty555555/" target="_blank" class="flex items-center justify-center gap-2 w-full py-3 bg-[#1877F2] hover:bg-[#166fe5] text-white font-bold rounded-xl transition-colors">
+<span class="material-symbols-outlined text-xl">group</span> Liên hệ Facebook
+</a>
+<a href="mailto:admin@htproxy.cloud?subject=Nâng cấp gói Business - Multi Router" class="flex items-center justify-center gap-2 w-full py-3 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold rounded-xl transition-colors">
+<span class="material-symbols-outlined text-xl">mail</span> Gửi Email
+</a>
+</div>
+</div>
+<div class="p-4 border-t border-slate-200 dark:border-slate-700">
+<button onclick="document.getElementById('upgrade-business-modal').classList.add('hidden')" class="w-full py-2.5 text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-slate-700 dark:hover:text-slate-200 transition-colors">Đóng</button>
+</div>
+</div>
+</div>
+
+<!-- Add Single Router Modal -->
+<div id="add-router-modal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden">
+<div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden">
+<div class="p-5 border-b border-slate-200 dark:border-slate-700">
+<h3 class="text-lg font-bold flex items-center gap-2"><span class="material-symbols-outlined text-primary">add_circle</span> Thêm Router</h3>
+</div>
+<div class="p-5 space-y-3">
+<div><label class="text-xs font-bold text-slate-500 uppercase">Host</label><input id="ar-host" type="text" class="w-full mt-1 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm px-3 py-2" placeholder="192.168.1.1"/></div>
+<div><label class="text-xs font-bold text-slate-500 uppercase">Username</label><input id="ar-user" type="text" class="w-full mt-1 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm px-3 py-2" placeholder="admin"/></div>
+<div><label class="text-xs font-bold text-slate-500 uppercase">Password</label><input id="ar-pass" type="password" class="w-full mt-1 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm px-3 py-2" placeholder="Mật khẩu"/></div>
+<div><label class="text-xs font-bold text-slate-500 uppercase">Ghi chú</label><input id="ar-note" type="text" class="w-full mt-1 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm px-3 py-2" placeholder="Tùy chọn..."/></div>
+</div>
+<div class="p-5 border-t border-slate-200 dark:border-slate-700 flex gap-3">
+<button onclick="document.getElementById('add-router-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-100 dark:bg-slate-700 rounded-lg text-sm font-bold">Hủy</button>
+<button onclick="saveAddRouter()" class="flex-1 py-2.5 bg-primary text-white rounded-lg text-sm font-bold">Thêm</button>
+</div>
+</div>
+</div>
+
+<!-- Edit Router Modal -->
+<div id="edit-router-modal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden">
+<div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-3xl mx-4 overflow-hidden max-h-[85vh] flex flex-col">
+<div class="p-5 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between flex-shrink-0">
+<h3 class="text-lg font-bold flex items-center gap-2"><span class="material-symbols-outlined text-amber-500">edit</span> Quản lý Router</h3>
+<button onclick="document.getElementById('edit-router-modal').classList.add('hidden')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"><span class="material-symbols-outlined">close</span></button>
+</div>
+<div class="flex flex-1 min-h-0 overflow-hidden">
+<div class="w-1/3 border-r border-slate-200 dark:border-slate-700 overflow-y-auto bg-slate-50 dark:bg-slate-900/50" id="er-list-panel">
+<div class="p-3 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 sticky top-0 z-10">
+<p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Chọn router để chỉnh sửa</p>
+</div>
+<div id="er-router-list" class="divide-y divide-slate-200 dark:divide-slate-700"></div>
+</div>
+<div class="w-2/3 p-6 overflow-y-auto flex flex-col" id="er-form-panel">
+<div id="er-placeholder" class="flex-1 flex items-center justify-center text-center">
+<div><span class="material-symbols-outlined text-5xl text-slate-300 dark:text-slate-600">touch_app</span><p class="text-sm text-slate-400 mt-3">Chọn router bên trái để chỉnh sửa</p></div>
+</div>
+<div id="er-form-content" class="hidden space-y-4 flex-1">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-amber-500 text-2xl">router</span>
+<div><p id="er-editing-name" class="text-base font-bold"></p><p id="er-editing-host" class="text-xs text-slate-400"></p></div>
+</div>
+<div class="grid grid-cols-1 gap-4">
+<div><label class="text-xs font-bold text-slate-500 uppercase block mb-1.5">Host</label><input id="er-host" type="text" class="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-amber-200 outline-none" placeholder="192.168.1.1"/></div>
+<div><label class="text-xs font-bold text-slate-500 uppercase block mb-1.5">Username</label><input id="er-user" type="text" class="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-amber-200 outline-none" placeholder="admin"/></div>
+<div><label class="text-xs font-bold text-slate-500 uppercase block mb-1.5">Password</label><input id="er-pass" type="text" class="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-amber-200 outline-none" placeholder="Để trống nếu không đổi"/></div>
+<div><label class="text-xs font-bold text-slate-500 uppercase block mb-1.5">Ghi chú / Tên router</label><input id="er-note" type="text" class="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-amber-200 outline-none" placeholder="VD: Router văn phòng"/></div>
+</div>
+<div class="flex gap-3 pt-2">
+<button onclick="saveEditRouter()" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2"><span class="material-symbols-outlined text-lg">save</span> Lưu thay đổi</button>
+<button id="er-test-btn" onclick="testEditRouter()" class="py-2.5 px-4 bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-1"><span class="material-symbols-outlined text-lg">wifi_tethering</span> Test</button>
+<button onclick="deleteEditRouter()" class="py-2.5 px-4 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-1"><span class="material-symbols-outlined text-lg">delete</span> Xóa</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Batch Import Modal -->
+<div id="batch-import-modal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden">
+<div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+<div class="p-5 border-b border-slate-200 dark:border-slate-700">
+<h3 class="text-lg font-bold flex items-center gap-2"><span class="material-symbols-outlined text-emerald-600">playlist_add</span> Nhập hàng loạt</h3>
+<p class="text-xs text-slate-500 mt-1">Mỗi dòng một router: <code class="bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded text-[10px]">host:username:password</code> hoặc <code class="bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded text-[10px]">host:username:password:ghi chú</code></p>
+</div>
+<div class="p-5">
+<textarea id="batch-input" rows="10" class="w-full border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm font-mono px-4 py-3 leading-relaxed" placeholder="192.168.1.1:admin:pass123&#10;10.0.0.1:admin:secret:Router văn phòng&#10;172.16.0.1:htproxy:12345"></textarea>
+<p id="batch-preview" class="text-xs text-slate-400 mt-2">0 router sẽ được thêm</p>
+</div>
+<div class="p-5 border-t border-slate-200 dark:border-slate-700 flex gap-3">
+<button onclick="document.getElementById('batch-import-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-100 dark:bg-slate-700 rounded-lg text-sm font-bold">Hủy</button>
+<button onclick="doBatchImport()" class="flex-1 py-2.5 bg-emerald-500 text-white rounded-lg text-sm font-bold">Nhập tất cả</button>
+</div>
+</div>
+</div>
+
+<!-- Change Pass All Modal -->
+<div id="chpass-modal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden">
+<div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden">
+<div class="p-5 border-b border-slate-200 dark:border-slate-700">
+<h3 class="text-lg font-bold flex items-center gap-2"><span class="material-symbols-outlined text-amber-500">key</span> Đổi Password</h3>
+<p class="text-xs text-slate-500 mt-1">Đổi password admin trên tất cả router đã chọn</p>
+</div>
+<div class="p-5 space-y-3">
+<div><label class="text-xs font-bold text-slate-500 uppercase">Password mới</label><input id="chpass-new" type="text" class="w-full mt-1 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm px-3 py-2" placeholder="Nhập password mới..."/></div>
+<div><label class="text-xs font-bold text-slate-500 uppercase">Username (mặc định: admin)</label><input id="chpass-user" type="text" class="w-full mt-1 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm px-3 py-2" value="admin"/></div>
+</div>
+<div class="p-5 border-t border-slate-200 dark:border-slate-700 flex gap-3">
+<button onclick="document.getElementById('chpass-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-100 dark:bg-slate-700 rounded-lg text-sm font-bold">Hủy</button>
+<button onclick="doChangePassAll()" class="flex-1 py-2.5 bg-amber-500 text-white rounded-lg text-sm font-bold">Đổi password</button>
+</div>
+</div>
+</div>
+
+<!-- Schedule Rotate Modal -->
+<div id="schedule-modal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden">
+<div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+<div class="p-5 border-b border-slate-200 dark:border-slate-700">
+<h3 class="text-lg font-bold flex items-center gap-2"><span class="material-symbols-outlined text-blue-500">schedule</span> Hẹn giờ xoay IP</h3>
+<p class="text-xs text-slate-500 mt-1" id="sched-modal-desc">Tự động xoay tất cả proxy theo chu kỳ</p>
+</div>
+<div class="p-5 space-y-4">
+<div>
+<label class="text-xs font-bold text-slate-500 uppercase mb-1.5 block">Chế độ</label>
+<div class="grid grid-cols-2 gap-2">
+<button onclick="setSchedMode('interval')" id="sched-mode-interval" class="sched-mode-btn py-2 rounded-lg text-xs font-bold border-2 border-blue-500 bg-blue-50 text-blue-600">Lặp lại</button>
+<button onclick="setSchedMode('daily')" id="sched-mode-daily" class="sched-mode-btn py-2 rounded-lg text-xs font-bold border-2 border-slate-200 text-slate-500">Giờ cố định</button>
+</div>
+</div>
+<div id="sched-interval-box">
+<label class="text-xs font-bold text-slate-500 uppercase mb-1.5 block">Xoay mỗi</label>
+<div class="flex gap-2 items-center">
+<input id="sched-val" type="number" min="1" max="1440" value="30" class="w-24 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm px-3 py-2 text-center font-bold"/>
+<select id="sched-unit" class="border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm px-3 py-2 font-bold">
+<option value="m">phút</option>
+<option value="h">giờ</option>
+</select>
+</div>
+<p class="text-[10px] text-slate-400 mt-1.5">Tối thiểu 1 phút, tối đa 24 giờ</p>
+</div>
+<div id="sched-daily-box" class="hidden">
+<label class="text-xs font-bold text-slate-500 uppercase mb-1.5 block">Xoay vào lúc</label>
+<input id="sched-time" type="time" value="06:00" class="w-full border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm px-3 py-2 font-bold"/>
+<p class="text-[10px] text-slate-400 mt-1.5">Mỗi ngày sẽ xoay 1 lần vào giờ này</p>
+</div>
+<div id="sched-status" class="hidden"></div>
+<!-- Per-interface schedule list -->
+<div id="sched-iface-list" class="hidden">
+<label class="text-xs font-bold text-slate-500 uppercase mb-1.5 block">Trạng thái hẹn giờ từng PPPoE</label>
+<div id="sched-iface-tbody" class="max-h-[200px] overflow-y-auto space-y-1"></div>
+</div>
+</div>
+<div class="p-5 border-t border-slate-200 dark:border-slate-700 flex gap-3">
+<button onclick="document.getElementById('schedule-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-100 dark:bg-slate-700 rounded-lg text-sm font-bold">Đóng</button>
+<button onclick="stopCurrentSchedule()" id="btn-sched-stop" class="flex-1 py-2.5 bg-red-500 text-white rounded-lg text-sm font-bold hidden">Dừng</button>
+<button onclick="startCurrentSchedule()" id="btn-sched-start" class="flex-1 py-2.5 bg-blue-500 text-white rounded-lg text-sm font-bold">Bắt đầu</button>
+</div>
+</div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="fixed top-6 right-6 z-50 hidden transform transition-all duration-300 translate-y-[-20px] opacity-0">
+  <div id="toast-inner" class="flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl border backdrop-blur-sm min-w-[320px]">
+    <span id="toast-icon" class="material-symbols-outlined text-xl"></span>
+    <div class="flex-1">
+      <p id="toast-title" class="text-sm font-bold"></p>
+      <p id="toast-msg" class="text-xs mt-0.5 opacity-80"></p>
+    </div>
+    <button onclick="hideToast()" class="text-slate-400 hover:text-slate-600 transition-colors">
+      <span class="material-symbols-outlined text-lg">close</span>
+    </button>
+  </div>
+</div>
+
+<!-- Modal Doi Mat Khau -->
+<div id="pwd-modal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closePwdModal()"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+      <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-bold">Đổi mật khẩu Proxy</h3>
+          <p id="pwd-modal-sub" class="text-xs text-slate-500 mt-0.5"></p>
+        </div>
+        <button onclick="closePwdModal()" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="p-6 space-y-5">
+        <!-- Mode Tabs -->
+        <div class="flex gap-2">
+          <button onclick="setPwdMode('manual')" id="tab-manual" class="flex-1 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 border-2 border-primary bg-primary/10 text-primary">
+            <span class="material-symbols-outlined text-base">edit</span> Nhập tay
+          </button>
+          <button onclick="setPwdMode('random')" id="tab-random" class="flex-1 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 border-2 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-primary/50">
+            <span class="material-symbols-outlined text-base">casino</span> Random
+          </button>
+          <button onclick="setPwdMode('clear')" id="tab-clear" class="flex-1 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 border-2 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-rose-400">
+            <span class="material-symbols-outlined text-base">delete</span> Xóa
+          </button>
+        </div>
+        <!-- Manual inputs -->
+        <div id="pwd-manual-fields" class="space-y-3">
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Proxy User</label>
+            <input id="pwd-new-login" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 outline-none" placeholder="admin"/>
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Proxy Password</label>
+            <input id="pwd-new-pass" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 outline-none" placeholder="password"/>
+          </div>
+        </div>
+        <!-- Random preview -->
+        <div id="pwd-random-fields" class="hidden space-y-3">
+          <div class="p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl">
+            <p class="text-xs text-emerald-600 dark:text-emerald-400 font-bold mb-2">Preview mật khẩu ngẫu nhiên</p>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs text-slate-500">User:</span>
+              <code id="pwd-rand-login" class="text-sm font-mono font-bold text-emerald-700 dark:text-emerald-300"></code>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-slate-500">Password:</span>
+              <code id="pwd-rand-pass" class="text-sm font-mono font-bold text-emerald-700 dark:text-emerald-300"></code>
+            </div>
+          </div>
+          <button onclick="genRandomPreview()" class="w-full py-2 text-xs font-bold text-primary hover:bg-primary/10 rounded-lg transition-colors flex items-center justify-center gap-1.5">
+            <span class="material-symbols-outlined text-base">refresh</span> Random lại
+          </button>
+        </div>
+        <!-- Clear warning -->
+        <div id="pwd-clear-fields" class="hidden">
+          <div class="p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-xl">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="material-symbols-outlined text-rose-500">warning</span>
+              <p class="text-sm font-bold text-rose-700 dark:text-rose-300">Xóa mật khẩu Proxy</p>
+            </div>
+            <p class="text-xs text-rose-600 dark:text-rose-400">Giá trị PROXY_LOGIN và PROXY_PASSWORD sẽ bị xóa trắng. Proxy sẽ không yêu cầu xác thực.</p>
+          </div>
+        </div>
+      </div>
+      <div class="p-6 border-t border-slate-200 dark:border-slate-700 flex items-center gap-3">
+        <button onclick="closePwdModal()" class="flex-1 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">Hủy</button>
+        <button id="pwd-confirm-btn" onclick="confirmChangePwd()" class="flex-1 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-base">check</span> Xác nhận & Restart
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Export Modal -->
+<div id="export-modal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden">
+  <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+    <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+      <h3 id="export-modal-title" class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">download</span> Tải về Proxy
+      </h3>
+      <button onclick="closeExportModal()" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+        <span class="material-symbols-outlined text-slate-400">close</span>
+      </button>
+    </div>
+    <div class="p-6 space-y-4">
+      <p class="text-sm text-slate-500 dark:text-slate-400">Chọn định dạng proxy muốn xuất:</p>
+      <div class="grid grid-cols-1 gap-2">
+        <button onclick="doExport('host_http')" class="export-fmt-btn flex items-center gap-3 px-4 py-3 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all text-left">
+          <span class="flex items-center justify-center size-9 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400"><span class="material-symbols-outlined text-lg">http</span></span>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-bold text-slate-800 dark:text-slate-200">HTTP — Host</div>
+            <div class="text-xs text-slate-400 font-mono truncate">host:port:user:pass</div>
+          </div>
+          <span class="text-[10px] font-bold px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 rounded">HTTP</span>
+        </button>
+        <button onclick="doExport('ip_http')" class="export-fmt-btn flex items-center gap-3 px-4 py-3 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all text-left">
+          <span class="flex items-center justify-center size-9 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400"><span class="material-symbols-outlined text-lg">language</span></span>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-bold text-slate-800 dark:text-slate-200">HTTP — IP</div>
+            <div class="text-xs text-slate-400 font-mono truncate">ip:port:user:pass</div>
+          </div>
+          <span class="text-[10px] font-bold px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 rounded">HTTP</span>
+        </button>
+        <button onclick="doExport('host_socks')" class="export-fmt-btn flex items-center gap-3 px-4 py-3 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all text-left">
+          <span class="flex items-center justify-center size-9 rounded-lg bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400"><span class="material-symbols-outlined text-lg">shield</span></span>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-bold text-slate-800 dark:text-slate-200">SOCKS — Host</div>
+            <div class="text-xs text-slate-400 font-mono truncate">host:socks_port:user:pass</div>
+          </div>
+          <span class="text-[10px] font-bold px-2 py-0.5 bg-purple-100 dark:bg-purple-900/40 text-purple-600 rounded">SOCKS</span>
+        </button>
+        <button onclick="doExport('ip_socks')" class="export-fmt-btn flex items-center gap-3 px-4 py-3 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all text-left">
+          <span class="flex items-center justify-center size-9 rounded-lg bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400"><span class="material-symbols-outlined text-lg">vpn_lock</span></span>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-bold text-slate-800 dark:text-slate-200">SOCKS — IP</div>
+            <div class="text-xs text-slate-400 font-mono truncate">ip:socks_port:user:pass</div>
+          </div>
+          <span class="text-[10px] font-bold px-2 py-0.5 bg-purple-100 dark:bg-purple-900/40 text-purple-600 rounded">SOCKS</span>
+        </button>
+        <button onclick="doExport('api_rotate')" class="export-fmt-btn flex items-center gap-3 px-4 py-3 bg-slate-50 dark:bg-slate-700/50 border border-emerald-200 dark:border-emerald-600 rounded-xl hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all text-left">
+          <span class="flex items-center justify-center size-9 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400"><span class="material-symbols-outlined text-lg">api</span></span>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-bold text-slate-800 dark:text-slate-200">API Xoay IP</div>
+            <div class="text-xs text-slate-400 font-mono truncate">domain/api/pppoe-outX/host/token</div>
+          </div>
+          <span class="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 rounded">API</span>
+        </button>
+      </div>
+      <div id="export-preview" class="hidden mt-3">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Xem trước:</span>
+          <button onclick="copyPreview()" class="text-xs text-primary font-bold hover:underline flex items-center gap-1"><span class="material-symbols-outlined text-sm">content_copy</span> Copy</button>
+        </div>
+        <pre id="export-preview-text" class="bg-slate-900 text-green-400 text-xs font-mono p-4 rounded-xl max-h-48 overflow-auto leading-relaxed"></pre>
+      </div>
+    </div>
+    <div class="p-6 border-t border-slate-200 dark:border-slate-700 flex items-center gap-3">
+      <button onclick="closeExportModal()" class="flex-1 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- Router Right-Click Context Menu -->
+<div id="router-ctx-menu" class="hidden fixed z-[9999] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl py-1.5 min-w-[180px]" style="left:0;top:0">
+<div id="ctx-router-name" class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase truncate max-w-[200px]"></div>
+<button onclick="ctxReconnect()" class="w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
+<span class="material-symbols-outlined text-blue-500 text-base">refresh</span> Kết nối lại
+</button>
+<button onclick="ctxTestRouter()" class="w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-emerald-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
+<span class="material-symbols-outlined text-emerald-500 text-base">wifi_tethering</span> Test kết nối
+</button>
+<button onclick="ctxEditRouter()" class="w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-amber-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
+<span class="material-symbols-outlined text-amber-500 text-base">edit</span> Chỉnh sửa
+</button>
+<div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
+<button onclick="ctxRemoveRouter()" class="w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-red-50 dark:hover:bg-slate-700 text-red-500 transition-colors">
+<span class="material-symbols-outlined text-base">delete</span> Xóa router
+</button>
+</div>
+
+<script>
+let _fbAuth = null, _fbDb = null, _fbUser = null;
+try {
+  if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+  _fbAuth = firebase.auth();
+  _fbDb = firebase.firestore();
+  _fbAuth.onAuthStateChanged(u => {
+    _fbUser = u;
+    if (u) _trySyncExistingConnection();
+  });
+} catch (e) { console.warn('Firebase init:', e); }
+
+function _trySyncExistingConnection() {
+  try {
+    const active = JSON.parse(localStorage.getItem('mk_active'));
+    if (active && active.host && _connected) {
+      syncMikrotikToFirestore({
+        host: active.host,
+        username: active.username || '',
+        password: active.password || '',
+        is_connected: true,
+      });
+    }
+  } catch (_) {}
+}
+
+function logMikrotikHistory(action, data) {
+  try {
+    const u = _fbUser || _fbAuth?.currentUser;
+    if (!u || !_fbDb) return;
+    _fbDb.collection('mikrotik_history').add({
+      user_id: u.uid,
+      action: action,
+      host: data.host || '',
+      identity: data.identity || '',
+      version: data.version || '',
+      uptime: data.uptime || '',
+      timestamp: new Date(),
+    }).catch(() => {});
+  } catch (_) {}
+}
+
+const API = 'http://127.0.0.1:8000/api';
+let _toastTimer = null;
+let _connected = false;
+let _mkCreds = null;
+let _pollTimer = null;
+let _livePollTimer = null;
+let _schedPollCount = 0;
+let _mapPollCount = 0;
+let _rotating = new Set();
+let _strikethrough = new Set();
+let _lastClients = [];
+let _mrActive = false;
+let _mrAllData = {};
+let _mrFilter = 'all';
+let _mrList = [];
+let _editingRouterIdx = -1;
+
+function saveSession() {
+  try {
+    const s = {
+      connected: _connected,
+      creds: _mkCreds,
+      clients: _lastClients,
+      mrActive: _mrActive,
+      mrAllData: _mrAllData,
+      mrFilter: _mrFilter,
+      ts: Date.now(),
+    };
+    localStorage.setItem('ht_dashboard_session', JSON.stringify(s));
+  } catch(e) { console.error('saveSession error:', e); }
+}
+
+function clearSession() {
+  localStorage.removeItem('ht_dashboard_session');
+}
+
+function restoreSession() {
+  try {
+    const raw = localStorage.getItem('ht_dashboard_session');
+    if (!raw) return false;
+    const s = JSON.parse(raw);
+    if (!s.connected || Date.now() - s.ts > 3600000) { clearSession(); return false; }
+
+    const tier = (localStorage.getItem('ht_license_tier') || 'personal').toLowerCase();
+    if (s.mrActive && s.mrAllData && Object.keys(s.mrAllData).length > 0 && tier === 'business') {
+      _connected = true;
+      _mrActive = true;
+      _mrAllData = s.mrAllData;
+      _mrFilter = s.mrFilter || 'all';
+      applyMultiMode();
+      renderMrNodes();
+      renderMultiTable();
+      document.getElementById('btn-connect-all').innerHTML = '<span class="material-symbols-outlined text-xs">check_circle</span> Đã kết nối';
+      document.getElementById('btn-disconnect-all').classList.remove('hidden');
+      updateHeaderStatus(true, 'Multi Router');
+      startLivePoll();
+      setTimeout(restoreSchedule, 1500);
+      return true;
+    }
+
+    if (s.creds && s.creds.host && s.clients && s.clients.length > 0) {
+      _connected = true;
+      _mkCreds = s.creds;
+      document.getElementById('mk-host').value = s.creds.host;
+      document.getElementById('mk-user').value = s.creds.username || '';
+      document.getElementById('mk-pass').value = s.creds.password || '';
+      renderTable(s.clients, s.creds.host);
+      updateHeaderStatus(true);
+      updateBtnState(false);
+      startLivePoll();
+      setTimeout(restoreSchedule, 1500);
+      return true;
+    }
+  } catch(e) { console.error('restoreSession error:', e); }
+  return false;
+}
+
+function saveRotationHistory(entry) {
+  try {
+    entry.host = entry.host || (_mkCreds && _mkCreds.host ? _mkCreds.host : '');
+    entry.source = entry.source || 'app';
+    const hist = JSON.parse(localStorage.getItem('rotation_history') || '[]');
+    hist.unshift(entry);
+    if (hist.length > 500) hist.length = 500;
+    localStorage.setItem('rotation_history', JSON.stringify(hist));
+  } catch (_) {}
+  sendRotateLogToApi(entry);
+}
+
+function sendRotateLogToApi(entry) {
+  try {
+    const apiHost = localStorage.getItem('api_host') || '';
+    if (!apiHost) return;
+    const host = (_mkCreds && _mkCreds.host) ? _mkCreds.host : '';
+    fetch(apiHost + '/log-rotate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        host: host,
+        action: 'rotate',
+        interface: entry.iface || '',
+        old_ip: entry.old_ip || '',
+        new_ip: entry.new_ip || '',
+        retries: entry.attempts || 0,
+        success: entry.status === 'success',
+        message: entry.status || '',
+        elapsed_ms: 0,
+      }),
+    }).catch(() => {});
+  } catch (_) {}
+}
+
+function showToast(type, title, msg) {
+  const el = document.getElementById('toast');
+  const inner = document.getElementById('toast-inner');
+  const icon = document.getElementById('toast-icon');
+  document.getElementById('toast-title').textContent = title;
+  document.getElementById('toast-msg').textContent = msg;
+  inner.className = 'flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl border backdrop-blur-sm min-w-[320px] ';
+  if (type === 'success') {
+    inner.classList.add('bg-emerald-50','dark:bg-emerald-900/80','border-emerald-200','dark:border-emerald-700','text-emerald-800','dark:text-emerald-200');
+    icon.textContent = 'check_circle'; icon.className = 'material-symbols-outlined text-xl text-emerald-500';
+  } else if (type === 'error') {
+    inner.classList.add('bg-rose-50','dark:bg-rose-900/80','border-rose-200','dark:border-rose-700','text-rose-800','dark:text-rose-200');
+    icon.textContent = 'error'; icon.className = 'material-symbols-outlined text-xl text-rose-500';
+  } else {
+    inner.classList.add('bg-amber-50','dark:bg-amber-900/80','border-amber-200','dark:border-amber-700','text-amber-800','dark:text-amber-200');
+    icon.textContent = 'warning'; icon.className = 'material-symbols-outlined text-xl text-amber-500';
+  }
+  el.classList.remove('hidden');
+  requestAnimationFrame(() => { el.classList.remove('translate-y-[-20px]','opacity-0'); el.classList.add('translate-y-0','opacity-100'); });
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(hideToast, 5000);
+}
+
+function hideToast() {
+  const el = document.getElementById('toast');
+  el.classList.add('translate-y-[-20px]','opacity-0');
+  el.classList.remove('translate-y-0','opacity-100');
+  setTimeout(() => el.classList.add('hidden'), 300);
+}
+
+function updateBtnState(loading) {
+  const btn = document.getElementById('btn-connect');
+  const txt = document.getElementById('btn-connect-text');
+  const ico = btn.querySelector('.material-symbols-outlined');
+  if (loading) {
+    btn.disabled = true; btn.classList.add('opacity-60','cursor-wait');
+    txt.textContent = 'Đang kết nối...';
+  } else if (_connected) {
+    btn.disabled = false; btn.classList.remove('opacity-60','cursor-wait');
+    btn.classList.remove('bg-primary','hover:bg-primary/90','shadow-lg','shadow-primary/20');
+    btn.classList.add('bg-rose-500','hover:bg-rose-600');
+    ico.textContent = 'power_settings_new';
+    txt.textContent = 'Ngắt kết nối';
+  } else {
+    btn.disabled = false; btn.classList.remove('opacity-60','cursor-wait');
+    btn.classList.remove('bg-rose-500','hover:bg-rose-600');
+    btn.classList.add('bg-primary','hover:bg-primary/90','shadow-lg','shadow-primary/20');
+    ico.textContent = 'bolt';
+    txt.textContent = 'Kết nối';
+  }
+}
+
+function updateStats(total, online, offline) {
+  document.getElementById('stat-total').textContent = total.toLocaleString();
+  document.getElementById('stat-online').textContent = online.toLocaleString();
+  document.getElementById('stat-offline').textContent = offline.toLocaleString();
+}
+
+function updateHeaderStatus(connected, identity) {
+  const el = document.getElementById('header-status');
+  if (connected) {
+    el.className = 'bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all shadow-lg shadow-emerald-500/20';
+    el.innerHTML = '<span class="size-2 rounded-full bg-white animate-pulse"></span> Đã Kết Nối' + (identity ? ' — ' + identity : '');
+  } else {
+    el.className = 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all';
+    el.innerHTML = '<span class="size-2 rounded-full bg-slate-400"></span> Chưa kết nối';
+  }
+}
+
+function fmtBytes(b) {
+  if (!b || b <= 0) return '0 B';
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+  if (b < 1073741824) return (b / 1048576).toFixed(1) + ' MB';
+  return (b / 1073741824).toFixed(2) + ' GB';
+}
+function gaugeRing(pct, color, size) {
+  const r = (size - 8) / 2, c = 2 * Math.PI * r, dash = c * pct / 100, gap = c - dash;
+  const col = pct > 85 ? '#ef4444' : pct > 60 ? '#f59e0b' : color;
+  return '<svg width="'+size+'" height="'+size+'" class="transform -rotate-90"><circle cx="'+(size/2)+'" cy="'+(size/2)+'" r="'+r+'" fill="none" stroke="currentColor" stroke-width="6" class="text-slate-100 dark:text-slate-700"/><circle cx="'+(size/2)+'" cy="'+(size/2)+'" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+dash+' '+gap+'" style="transition:stroke-dasharray 0.8s ease"/></svg>';
+}
+function updateSystemInfo(data) {
+  const el = document.getElementById('system-info');
+  const cpu = parseInt(data.cpu_load) || 0;
+  const totalMem = data.total_memory || 0;
+  const usedMem = data.used_memory || 0;
+  const ramPct = totalMem > 0 ? Math.round(usedMem / totalMem * 100) : 0;
+  const totalHdd = data.total_hdd || 0;
+  const usedHdd = data.used_hdd || 0;
+  const hddPct = totalHdd > 0 ? Math.round(usedHdd / totalHdd * 100) : 0;
+  el.innerHTML = `
+    <div class="flex items-center justify-between p-3 bg-emerald-50/50 dark:bg-emerald-900/10 rounded-xl border border-emerald-100 dark:border-emerald-900/30 mb-4">
+      <div class="flex items-center gap-3">
+        <div class="size-9 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 rounded-full flex items-center justify-center">
+          <span class="material-symbols-outlined text-lg">router</span>
+        </div>
+        <div>
+          <p class="text-sm font-bold">${data.identity || 'HT Proxy'}</p>
+          <p class="text-[10px] text-emerald-600 font-medium">HT Proxy • ${data.board || ''} ${data.arch || ''}</p>
+        </div>
+      </div>
+      <span class="text-[10px] font-bold text-emerald-600 bg-emerald-100 dark:bg-emerald-900/40 px-2 py-0.5 rounded-full">Online</span>
+    </div>
+    <div class="grid grid-cols-3 gap-3 mb-4">
+      <div class="flex flex-col items-center p-3 bg-slate-50 dark:bg-slate-700/20 rounded-xl">
+        <div class="relative flex items-center justify-center">
+          ${gaugeRing(cpu, '#3b82f6', 72)}
+          <span class="absolute text-base font-black text-slate-800 dark:text-white">${cpu}%</span>
+        </div>
+        <p class="text-[10px] font-bold text-slate-500 mt-2 uppercase tracking-wider">CPU</p>
+        <p class="text-[9px] text-slate-400">${data.cpu_count || 1} Core • ${data.cpu_freq || 0} MHz</p>
+      </div>
+      <div class="flex flex-col items-center p-3 bg-slate-50 dark:bg-slate-700/20 rounded-xl">
+        <div class="relative flex items-center justify-center">
+          ${gaugeRing(ramPct, '#8b5cf6', 72)}
+          <span class="absolute text-base font-black text-slate-800 dark:text-white">${ramPct}%</span>
+        </div>
+        <p class="text-[10px] font-bold text-slate-500 mt-2 uppercase tracking-wider">RAM</p>
+        <p class="text-[9px] text-slate-400">${fmtBytes(usedMem)} / ${fmtBytes(totalMem)}</p>
+      </div>
+      <div class="flex flex-col items-center p-3 bg-slate-50 dark:bg-slate-700/20 rounded-xl">
+        <div class="relative flex items-center justify-center">
+          ${gaugeRing(hddPct, '#10b981', 72)}
+          <span class="absolute text-base font-black text-slate-800 dark:text-white">${hddPct}%</span>
+        </div>
+        <p class="text-[10px] font-bold text-slate-500 mt-2 uppercase tracking-wider">Storage</p>
+        <p class="text-[9px] text-slate-400">${fmtBytes(usedHdd)} / ${fmtBytes(totalHdd)}</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3 p-3 bg-blue-50/50 dark:bg-blue-900/10 rounded-xl border border-blue-100 dark:border-blue-900/30">
+      <div class="size-9 bg-blue-100 dark:bg-blue-900/40 text-blue-600 rounded-full flex items-center justify-center">
+        <span class="material-symbols-outlined text-lg">schedule</span>
+      </div>
+      <div class="flex-1">
+        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Uptime</p>
+        <p class="text-sm font-bold text-slate-800 dark:text-white">${data.uptime || 'N/A'}</p>
+      </div>
+    </div>`;
+}
+
+function resetSystemInfo() {
+  document.getElementById('system-info').innerHTML = `
+    <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/30 rounded-xl">
+      <div class="flex items-center gap-3">
+        <div class="size-10 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-full flex items-center justify-center">
+          <span class="material-symbols-outlined">router</span>
+        </div>
+        <div>
+          <p class="text-sm font-bold">Chưa kết nối HT Proxy</p>
+          <p class="text-xs text-slate-500">Nhập thông tin để kết nối</p>
+        </div>
+      </div>
+    </div>`;
+}
+
+function getStatusInfo(c) {
+  if (_rotating.has(c.name) || c.status === 'rotating') {
+    return {
+      cls: 'bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400',
+      dot: 'bg-amber-500 animate-pulse', txt: 'Đang xoay...',
+      ipHtml: '<span class="inline-flex items-center gap-1.5 text-amber-500 text-sm font-bold"><span class="material-symbols-outlined text-sm animate-spin">sync</span> Đang xoay...</span>',
+    };
+  }
+  if (c.status === 'disabled') {
+    return {
+      cls: 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400',
+      dot: 'bg-slate-400', txt: 'Đang tắt',
+      ipHtml: '<span class="text-sm font-bold text-slate-400">—</span>',
+    };
+  }
+  if (c.status === 'online') {
+    return {
+      cls: 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400',
+      dot: 'bg-emerald-500', txt: 'Trực tuyến',
+      ipHtml: '<span class="text-sm font-bold text-blue-600 dark:text-blue-400">' + c.ip + '</span>',
+    };
+  }
+  return {
+    cls: 'bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400',
+    dot: 'bg-amber-500 animate-pulse', txt: 'Chờ IP...',
+    ipHtml: '<span class="inline-flex items-center gap-1.5 text-amber-500 text-sm font-bold"><span class="material-symbols-outlined text-sm animate-spin">hourglass_top</span> Chờ IP...</span>',
+  };
+}
+
+function filterProxyTable(q) {
+  const tbody = document.getElementById('proxy-tbody');
+  if (!tbody) return;
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  const query = (q || '').trim().toLowerCase();
+  if (!query) {
+    rows.forEach(r => { r.style.display = ''; });
+    return;
+  }
+  const isHeaderRow = (tr) => tr.cells.length === 1 && tr.cells[0].colSpan === 7;
+  const getText = (tr) => ((tr.getAttribute('data-search') || '') + ' ' + (tr.textContent || '')).toLowerCase();
+  const matches = (tr) => getText(tr).includes(query);
+
+  const visible = new Map();
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i];
+    if (isHeaderRow(r)) {
+      visible.set(r, matches(r));
+    } else {
+      visible.set(r, matches(r));
+    }
+  }
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i];
+    if (isHeaderRow(r)) {
+      let anyChild = false;
+      for (let j = i + 1; j < rows.length; j++) {
+        if (isHeaderRow(rows[j])) break;
+        if (visible.get(rows[j])) { anyChild = true; break; }
+      }
+      visible.set(r, visible.get(r) || anyChild);
+    }
+  }
+  rows.forEach(r => { r.style.display = visible.get(r) ? '' : 'none'; });
+}
+
+function renderTable(clients, host) {
+  const tbody = document.getElementById('proxy-tbody');
+  if (!clients || clients.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-12 text-center text-slate-400 text-sm">Không tìm thấy PPPoE client nào</td></tr>';
+    updateStats(0, 0, 0);
+    document.getElementById('pagination-text').textContent = 'Không có dữ liệu';
+    return;
+  }
+  const online = clients.filter(c => c.status === 'online').length;
+  const disabled = clients.filter(c => c.status === 'disabled').length;
+  updateStats(clients.length, online, clients.length - online);
+  document.getElementById('pagination-text').textContent = 'Hiển thị ' + clients.length + ' Proxy từ ' + host;
+
+  _lastClients = clients;
+  document.getElementById('chk-all').checked = false;
+
+  tbody.innerHTML = clients.map(c => {
+    const st = getStatusInfo(c);
+    const uid = 'pwd-' + c.stt;
+    const rowCls = c.status === 'disabled' ? 'opacity-50' : '';
+
+    const isOut1 = c.name === 'pppoe-out1';
+    const searchText = [c.name, c.ip || '', host, c.http_port, c.socks_port, c.proxy_login || '', c.proxy_password || '', st.txt].filter(Boolean).join(' ');
+
+    return '<tr data-iface="' + encAttr(c.name) + '" data-search="' + encAttr(searchText) + '" class="cursor-pointer transition-colors ' + rowCls + '" onclick="selectRow(this,event)">' +
+      '<td class="pl-4 pr-1 py-5"><input type="checkbox" class="row-chk size-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer" data-name="' + encAttr(c.name) + '" onclick="event.stopPropagation();syncRowHighlight(this)"/></td>' +
+      '<td class="px-4 py-5 text-sm font-medium text-slate-400">' + String(c.stt).padStart(2,'0') + '</td>' +
+      '<td class="px-4 py-5 poll-ip"><div class="flex flex-col">' + st.ipHtml + '</div></td>' +
+      '<td class="px-4 py-5"><div class="space-y-1">' +
+        '<div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-bold px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 rounded">HTTP</span><span class="text-sm font-mono text-slate-600 dark:text-slate-300">' + host + ':' + c.http_port + '</span></div>' +
+        '<div class="flex items-center gap-2"><span class="text-[10px] font-bold px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 rounded">SOCKS</span><span class="text-sm font-mono text-slate-600 dark:text-slate-300">' + host + ':' + c.socks_port + '</span></div>' +
+      '</div></td>' +
+      '<td class="px-4 py-5"><div class="flex items-center justify-between px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg w-36">' +
+        '<span id="' + uid + '" class="text-xs font-mono text-slate-500" data-login="' + encAttr(c.proxy_login || '') + '" data-pass="' + encAttr(c.proxy_password || '') + '">••••••••</span>' +
+        '<button class="pwd-toggle text-slate-400 hover:text-primary transition-colors" data-target="' + uid + '">' +
+          '<span class="material-symbols-outlined text-sm">visibility</span>' +
+        '</button>' +
+      '</div></td>' +
+      '<td class="px-4 py-5 poll-status"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full ' + st.cls + ' text-xs font-bold"><span class="size-1.5 rounded-full ' + st.dot + '"></span> ' + st.txt + '</span></td>' +
+      '<td class="px-4 py-5 text-right"><div class="flex items-center justify-end gap-1">' +
+        '<button class="p-1.5 text-primary hover:bg-primary/10 rounded-lg transition-colors" title="Đổi mật khẩu" onclick="event.stopPropagation();openPwdModal(\'' + encAttr(c.envlist || '') + '\',\'' + encAttr(c.container_id || '') + '\',\'' + encAttr(c.name || '') + '\')"><span class="material-symbols-outlined text-[20px]">key</span></button>' +
+        (isOut1
+          ? '<span class="p-1.5 text-slate-300 cursor-not-allowed" title="Cổng điều khiển — không xoay IP"><span class="material-symbols-outlined text-[20px]">lock</span></span>'
+          : '<button class="p-1.5 text-amber-500 hover:bg-amber-50 rounded-lg transition-colors" onclick="event.stopPropagation();rotateOne(\'' + c.name + '\')" title="Xoay IP"><span class="material-symbols-outlined text-[20px]">sync</span></button>' +
+            '<button class="p-1.5 rounded-lg transition-colors sched-btn-' + encAttr(c.name) + ' ' + (getIfaceSched(c.name) ? 'text-blue-500 hover:bg-blue-50' : 'text-slate-400 hover:bg-slate-50') + '" onclick="event.stopPropagation();openIfaceSchedModal(\'' + encAttr(c.name) + '\')" title="Hẹn giờ xoay"><span class="material-symbols-outlined text-[20px]">schedule</span></button>') +
+        (c.container_id ? '<button class="p-1.5 text-emerald-500 hover:bg-emerald-50 rounded-lg transition-colors" onclick="event.stopPropagation();restartContainer(\'' + encAttr(c.container_id) + '\',\'' + encAttr(c.name) + '\')" title="Restart Container"><span class="material-symbols-outlined text-[20px]">restart_alt</span></button>' : '') +
+      '</div>' +
+      '<div class="sched-info-' + encAttr(c.name) + ' mt-1"></div>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+  const searchEl = document.getElementById('search-proxy');
+  if (searchEl && searchEl.value.trim()) filterProxyTable(searchEl.value);
+  setTimeout(() => { initVnMap(); updateMapMarkers(); }, 300);
+}
+
+function encAttr(s) {
+  return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('.pwd-toggle');
+  if (!btn) return;
+  const id = btn.dataset.target;
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (el.textContent === '••••••••') {
+    el.textContent = (el.dataset.login || '') + '/' + (el.dataset.pass || '');
+  } else {
+    el.textContent = '••••••••';
+  }
+});
+
+function clearTable() {
+  document.getElementById('proxy-tbody').innerHTML = '<tr><td colspan="7" class="px-6 py-12 text-center text-slate-400 text-sm">Nhập thông tin kết nối và nhấn "Kết nối"</td></tr>';
+  updateStats(0, 0, 0);
+  document.getElementById('pagination-text').textContent = 'Chưa có dữ liệu';
+}
+
+function selectRow(tr, e) {
+  const chk = tr.querySelector('.row-chk');
+  if (!chk) return;
+  if (e && (e.ctrlKey || e.metaKey)) {
+    chk.checked = !chk.checked;
+    tr.classList.toggle('row-selected', chk.checked);
+    tr.classList.toggle('bg-blue-50', chk.checked);
+    tr.classList.toggle('dark:bg-blue-900/20', chk.checked);
+  } else {
+    document.querySelectorAll('#proxy-tbody tr.row-selected').forEach(r => {
+      r.classList.remove('row-selected', 'bg-blue-50', 'dark:bg-blue-900/20');
+      const cb = r.querySelector('.row-chk');
+      if (cb) cb.checked = false;
+    });
+    chk.checked = true;
+    tr.classList.add('row-selected', 'bg-blue-50', 'dark:bg-blue-900/20');
+  }
+  const allChks = document.querySelectorAll('.row-chk');
+  const allChecked = Array.from(allChks).every(c => c.checked);
+  document.getElementById('chk-all').checked = allChecked;
+}
+
+function syncRowHighlight(chk) {
+  const tr = chk.closest('tr');
+  if (!tr) return;
+  tr.classList.toggle('row-selected', chk.checked);
+  tr.classList.toggle('bg-blue-50', chk.checked);
+  tr.classList.toggle('dark:bg-blue-900/20', chk.checked);
+  const allChks = document.querySelectorAll('.row-chk');
+  document.getElementById('chk-all').checked = Array.from(allChks).every(c => c.checked);
+}
+
+function toggleAllCheckboxes(checked) {
+  document.querySelectorAll('.row-chk').forEach(cb => { cb.checked = checked; syncRowHighlight(cb); });
+}
+
+function getSelectedNames() {
+  return Array.from(document.querySelectorAll('.row-chk:checked')).map(cb => cb.dataset.name).filter(Boolean);
+}
+
+async function disableSelected() {
+  const names = getSelectedNames().filter(n => n !== 'pppoe-out1');
+  if (!names.length) { showToast('warn', 'Chưa chọn', 'Chọn ít nhất 1 proxy (pppoe-out1 là cổng điều khiển, bỏ qua)'); return; }
+  if (!_mkCreds) { showToast('warn', 'Chưa kết nối', 'Vui lòng kết nối HT Proxy trước'); return; }
+  showToast('warn', 'Đang disable...', names.length + ' interface');
+  try {
+    const res = await fetch(API + '/mikrotik/disable-interfaces?names=' + encodeURIComponent(names.join(',')), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(_mkCreds),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast('success', 'Disable thành công', data.total + ' interface đã tắt');
+    } else {
+      showToast('error', 'Lỗi', data.detail || 'Không thể disable');
+    }
+  } catch (e) {
+    showToast('error', 'Lỗi', 'Không thể gọi API');
+  }
+}
+
+async function enableSelected() {
+  const names = getSelectedNames();
+  if (!names.length) { showToast('warn', 'Chưa chọn', 'Vui lòng chọn ít nhất 1 proxy'); return; }
+  if (!_mkCreds) { showToast('warn', 'Chưa kết nối', 'Vui lòng kết nối HT Proxy trước'); return; }
+  showToast('warn', 'Đang enable...', names.length + ' interface');
+  try {
+    const res = await fetch(API + '/mikrotik/enable-interfaces?names=' + encodeURIComponent(names.join(',')), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(_mkCreds),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast('success', 'Enable thành công', data.total + ' interface đã bật');
+    } else {
+      showToast('error', 'Lỗi', data.detail || 'Không thể enable');
+    }
+  } catch (e) {
+    showToast('error', 'Lỗi', 'Không thể gọi API');
+  }
+}
+
+async function doConnect() {
+  const host = document.getElementById('mk-host').value.trim();
+  const username = document.getElementById('mk-user').value.trim();
+  const password = document.getElementById('mk-pass').value;
+  if (!host) { showToast('warn', 'Thiếu thông tin', 'Vui lòng nhập địa chỉ Host'); return; }
+  if (!username) { showToast('warn', 'Thiếu thông tin', 'Vui lòng nhập Username'); return; }
+
+  updateBtnState(true);
+  try {
+    const res = await fetch(API + '/mikrotik/test', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ host, username, password }),
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.connected) {
+      const errMsg = data.error || data.detail || 'Không thể kết nối';
+      const low = errMsg.toLowerCase();
+      if (low.includes('password') || low.includes('auth') || low.includes('login') || low.includes('cannot log in')) {
+        showToast('error', 'Sai mật khẩu', 'Username hoặc Password không đúng');
+      } else if (low.includes('timed out') || low.includes('timeout') || low.includes('refused')) {
+        showToast('error', 'Host không phản hồi', 'Máy chạy Backend API phải truy cập được MikroTik (cùng mạng/VPN). Bạn vào được Winbox từ máy nào thì cấu hình API trỏ về máy đó (vd: http://127.0.0.1:8000).');
+      } else {
+        showToast('error', 'Kết nối thất bại', errMsg);
+      }
+      _connected = false; updateHeaderStatus(false); updateBtnState(false);
+      return;
+    }
+
+    _connected = true;
+    _mkCreds = { host, username, password };
+    localStorage.setItem('mk_active', JSON.stringify({ host, username, password }));
+    if (document.getElementById('chk-save').checked) {
+      localStorage.setItem('mk_saved', JSON.stringify({ host, username, password }));
+      localStorage.setItem('mk_auto', document.getElementById('chk-auto').checked ? '1' : '');
+    } else {
+      localStorage.removeItem('mk_saved');
+      localStorage.removeItem('mk_auto');
+    }
+    syncMikrotikToFirestore({
+      host, username, password,
+      identity: data.identity || '',
+      version: data.version || '',
+      uptime: data.uptime || '',
+      cpu_load: data.cpu_load || '',
+      is_connected: true,
+      connected_at: new Date().toISOString(),
+    });
+    logMikrotikHistory('connect', { host, identity: data.identity, version: data.version, uptime: data.uptime });
+    showToast('success', 'Kết nối thành công!', 'HT Proxy — Uptime: ' + data.uptime);
+    updateHeaderStatus(true, data.identity);
+    updateSystemInfo(data);
+
+    const pppoeRes = await fetch(API + '/mikrotik/pppoe-clients', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ host, username, password }),
+    });
+    if (pppoeRes.ok) {
+      const pppoeData = await pppoeRes.json();
+      renderTable(pppoeData.clients, pppoeData.host || host);
+    }
+    startLivePoll();
+    saveSession();
+    setTimeout(loadMkSchedules, 1500);
+  } catch (e) {
+    showToast('error', 'Lỗi kết nối', 'Không thể kết nối đến Backend API. Kiểm tra server đang chạy.');
+    _connected = false; updateHeaderStatus(false);
+  }
+  updateBtnState(false);
+}
+
+function doDisconnect() {
+  const oldHost = _mkCreds?.host || '';
+  _connected = false;
+  _mkCreds = null;
+  stopLivePoll();
+  _schedTimers = {}; _schedCountdownTimers = {}; _schedNextRuns = {};
+  updateSchedUI(); refreshAllSchedInfo();
+  updateHeaderStatus(false);
+  updateBtnState(false);
+  clearTable();
+  resetSystemInfo();
+  clearSession();
+  syncMikrotikToFirestore({ is_connected: false, disconnected_at: new Date().toISOString() });
+  logMikrotikHistory('disconnect', { host: oldHost });
+  showToast('success', 'Đã ngắt kết nối', 'HT Proxy đã được ngắt kết nối');
+}
+
+async function refreshTable() {
+  if (_mrActive && Object.keys(_mrAllData).length > 0) {
+    await mrRefreshTable();
+    return;
+  }
+  if (!_mkCreds) return;
+  try {
+    const res = await fetch(API + '/mikrotik/pppoe-clients', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(_mkCreds),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      renderTable(data.clients, data.host || _mkCreds.host);
+    }
+  } catch (_) {}
+}
+
+async function mrRefreshTable() {
+  for (const key of Object.keys(_mrAllData)) {
+    const d = _mrAllData[key];
+    if (!d) continue;
+    const creds = { host: d.router.host, username: d.router.username, password: d.router.password };
+    try {
+      const res = await fetch(API + '/mikrotik/pppoe-clients', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(creds),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        _mrAllData[key].clients = data.clients || [];
+        _mrAllData[key].host = data.host || creds.host;
+        _mrAllData[key].router.proxy_count = (data.clients || []).length;
+      }
+    } catch(_) {}
+  }
+  renderMultiTable();
+  renderMrNodes();
+}
+
+function startLivePoll() {
+  stopLivePoll();
+  _livePollTimer = setInterval(livePollUpdate, 5000);
+}
+
+function stopLivePoll() {
+  if (_livePollTimer) { clearInterval(_livePollTimer); _livePollTimer = null; }
+}
+
+async function livePollUpdate() {
+  if (!_connected) return;
+  _schedPollCount++;
+  if (_schedPollCount >= 6) { _schedPollCount = 0; loadMkSchedules(); }
+  _mapPollCount++;
+  if (_mapPollCount >= 12) { _mapPollCount = 0; updateMapMarkers(); }
+  if (_mrActive && Object.keys(_mrAllData).length > 0) {
+    await livePollMulti();
+    return;
+  }
+  if (!_mkCreds) return;
+  try {
+    const res = await fetch(API + '/mikrotik/pppoe-status', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(_mkCreds),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const clients = data.clients || [];
+    const tbody = document.getElementById('proxy-tbody');
+    const rows = tbody.querySelectorAll('tr[data-iface]');
+    let onlineCount = 0, disabledCount = 0;
+    rows.forEach(row => {
+      const name = row.dataset.iface;
+      const info = clients.find(c => c.name === name);
+      if (!info) return;
+      const ipCell = row.querySelector('.poll-ip');
+      const statusCell = row.querySelector('.poll-status');
+      const hasStrike = _strikethrough.has(name);
+
+      if (info.disabled) {
+        disabledCount++;
+        row.classList.add('opacity-50');
+        if (ipCell && !hasStrike) ipCell.innerHTML = '<div class="flex flex-col"><span class="text-sm font-bold text-slate-400">—</span></div>';
+        if (statusCell) statusCell.innerHTML = '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-xs font-bold"><span class="size-1.5 rounded-full bg-slate-400"></span> Đang tắt</span>';
+      } else if (info.running && info.ip) {
+        onlineCount++;
+        row.classList.remove('opacity-50');
+        if (ipCell && !hasStrike) ipCell.innerHTML = '<div class="flex flex-col"><span class="text-sm font-bold text-blue-600 dark:text-blue-400">' + info.ip + '</span></div>';
+        if (statusCell) statusCell.innerHTML = '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 text-xs font-bold"><span class="size-1.5 rounded-full bg-emerald-500"></span> Trực tuyến</span>';
+      } else {
+        row.classList.remove('opacity-50');
+        if (ipCell && !hasStrike) ipCell.innerHTML = '<div class="flex flex-col"><span class="inline-flex items-center gap-1.5 text-amber-500 text-sm font-bold"><span class="material-symbols-outlined text-sm animate-spin">hourglass_top</span> Chờ IP...</span></div>';
+        if (statusCell) statusCell.innerHTML = '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-xs font-bold"><span class="size-1.5 rounded-full bg-amber-500 animate-pulse"></span> Chờ IP...</span>';
+      }
+    });
+    const total = rows.length;
+    document.getElementById('stat-online').textContent = onlineCount;
+    document.getElementById('stat-offline').textContent = (total - onlineCount);
+  } catch (_) {}
+}
+
+async function livePollMulti() {
+  const tbody = document.getElementById('proxy-tbody');
+  let totalOnline = 0, totalAll = 0;
+  for (const key of Object.keys(_mrAllData)) {
+    const d = _mrAllData[key];
+    if (!d) continue;
+    const creds = { host: d.router.host, username: d.router.username, password: d.router.password };
+    try {
+      const res = await fetch(API + '/mikrotik/pppoe-status', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(creds),
+      });
+      if (!res.ok) continue;
+      const data = await res.json();
+      const clients = data.clients || [];
+      const rows = tbody.querySelectorAll('tr[data-iface][data-router="' + key + '"]');
+      rows.forEach(row => {
+        const name = row.dataset.iface;
+        const info = clients.find(c => c.name === name);
+        if (!info) return;
+        totalAll++;
+        const ipCell = row.querySelector('.poll-ip');
+        const statusCell = row.querySelector('.poll-status');
+        const strikeKey = key + ':' + name;
+        const hasStrike = _strikethrough.has(strikeKey) || _strikethrough.has(name);
+        if (info.disabled) {
+          row.classList.add('opacity-50');
+          if (ipCell && !hasStrike) ipCell.innerHTML = '<div class="flex flex-col"><span class="text-sm font-bold text-slate-400">—</span></div>';
+          if (statusCell) statusCell.innerHTML = '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-xs font-bold"><span class="size-1.5 rounded-full bg-slate-400"></span> Đang tắt</span>';
+        } else if (info.running && info.ip) {
+          totalOnline++;
+          row.classList.remove('opacity-50');
+          if (ipCell && !hasStrike) ipCell.innerHTML = '<div class="flex flex-col"><span class="text-sm font-bold text-blue-600 dark:text-blue-400">' + info.ip + '</span></div>';
+          if (statusCell) statusCell.innerHTML = '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 text-xs font-bold"><span class="size-1.5 rounded-full bg-emerald-500"></span> Trực tuyến</span>';
+        } else {
+          row.classList.remove('opacity-50');
+          if (ipCell && !hasStrike) ipCell.innerHTML = '<div class="flex flex-col"><span class="inline-flex items-center gap-1.5 text-amber-500 text-sm font-bold"><span class="material-symbols-outlined text-sm animate-spin">hourglass_top</span> Chờ IP...</span></div>';
+          if (statusCell) statusCell.innerHTML = '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-xs font-bold"><span class="size-1.5 rounded-full bg-amber-500 animate-pulse"></span> Chờ IP...</span>';
+        }
+      });
+    } catch(_) {}
+  }
+  document.getElementById('stat-online').textContent = totalOnline;
+  document.getElementById('stat-offline').textContent = (totalAll - totalOnline);
+  saveSession();
+}
+
+async function rotateOne(iface) {
+  if (iface === 'pppoe-out1') { showToast('warn', 'Không thể xoay', 'pppoe-out1 là cổng điều khiển, không được xoay IP'); return; }
+  if (!_mkCreds) { showToast('warn', 'Chưa kết nối', 'Vui lòng kết nối HT Proxy trước'); return; }
+  _rotating.add(iface);
+  updateRowRotating(iface);
+  startPolling();
+  showToast('warn', 'Đang xoay IP...', iface + ' — tắt 5s rồi bật lại, chờ IP mới...');
+  try {
+    const res = await fetch(API + '/mikrotik/rotate-ip?interface_name=' + encodeURIComponent(iface), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(_mkCreds),
+    });
+    const data = await res.json();
+    _rotating.delete(iface);
+    stopPolling();
+    if (res.ok && data.status === 'success') {
+      showToast('success', 'Xoay IP thành công', iface + ': ' + data.old_ip + ' → ' + data.new_ip + (data.attempts > 1 ? ' (thử ' + data.attempts + ' lần)' : ''));
+      showOldIpStrikethrough(iface, data.old_ip, data.new_ip);
+      saveRotationHistory({ iface, old_ip: data.old_ip, new_ip: data.new_ip, status: 'success', attempts: data.attempts || 1, time: new Date().toISOString() });
+    } else if (data.status === 'duplicate') {
+      showToast('warn', 'IP bị trùng', iface + ': ' + data.new_ip + ' — thử lại hoặc xoay tất cả');
+      saveRotationHistory({ iface, old_ip: data.old_ip || '', new_ip: data.new_ip || '', status: 'duplicate', attempts: data.attempts || 1, time: new Date().toISOString() });
+    } else {
+      showToast('error', 'Xoay thất bại', data.detail || data.status || 'Timeout');
+      saveRotationHistory({ iface, old_ip: '', new_ip: '', status: 'failed', attempts: 0, time: new Date().toISOString() });
+    }
+  } catch (e) {
+    _rotating.delete(iface);
+    stopPolling();
+    showToast('error', 'Lỗi', 'Không thể gọi API xoay IP');
+    saveRotationHistory({ iface, old_ip: '', new_ip: '', status: 'error', attempts: 0, time: new Date().toISOString() });
+  }
+  startLivePoll();
+}
+
+async function rotateAllIps() {
+  if (_mrActive && Object.keys(_mrAllData).length > 0) {
+    await mrRotateAll();
+    return;
+  }
+  if (!_mkCreds) { showToast('warn', 'Chưa kết nối', 'Vui lòng kết nối HT Proxy trước'); return; }
+  const btn = document.querySelector('[onclick="rotateAllIps()"]');
+  if (btn) { btn.disabled = true; btn.classList.add('opacity-60', 'cursor-wait'); }
+
+  const oldIps = {};
+  _lastClients.forEach(c => { if (c.ip && c.name !== 'pppoe-out1') oldIps[c.name] = c.ip; });
+
+  _lastClients.filter(c => c.name !== 'pppoe-out1').forEach(c => _rotating.add(c.name));
+  renderTable(_lastClients.map(c => c.name === 'pppoe-out1' ? c : ({...c, ip: '', status: 'rotating'})), _mkCreds.host);
+  startPolling();
+  showToast('warn', 'Đang xoay tất cả IP...', 'Tắt 5s → Bật lại → Chờ IP mới + kiểm tra trùng...');
+
+  try {
+    const res = await fetch(API + '/mikrotik/rotate-all-ips', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(_mkCreds),
+    });
+    const data = await res.json();
+    _rotating.clear();
+    stopPolling();
+    if (res.ok) {
+      const results = data.results || [];
+      const changed = results.filter(r => r.old_ip !== r.new_ip).length;
+      const dups = results.filter(r => r.re_rotated).length;
+      let msg = changed + '/' + results.length + ' IP đã đổi';
+      if (dups) msg += ', ' + dups + ' xoay lại do trùng';
+      showToast(data.status === 'success' ? 'success' : 'warn', 'Xoay IP hoàn tất', msg);
+      results.forEach(r => {
+        if (r.new_ip && r.old_ip && r.old_ip !== r.new_ip) {
+          showOldIpStrikethrough(r.interface, r.old_ip, r.new_ip);
+        }
+        saveRotationHistory({ iface: r.interface, old_ip: r.old_ip || '', new_ip: r.new_ip || '', status: r.old_ip !== r.new_ip ? 'success' : 'unchanged', attempts: r.attempts || 1, time: new Date().toISOString() });
+      });
+    } else {
+      showToast('error', 'Xoay thất bại', data.detail || 'Lỗi');
+      saveRotationHistory({ iface: 'all', old_ip: '', new_ip: '', status: 'failed', attempts: 0, time: new Date().toISOString() });
+    }
+  } catch (e) {
+    _rotating.clear();
+    stopPolling();
+    showToast('error', 'Lỗi', 'Không thể gọi API xoay tất cả');
+    saveRotationHistory({ iface: 'all', old_ip: '', new_ip: '', status: 'error', attempts: 0, time: new Date().toISOString() });
+  }
+  if (btn) { btn.disabled = false; btn.classList.remove('opacity-60', 'cursor-wait'); }
+  startLivePoll();
+}
+
+async function mrRotateAll() {
+  const btn = document.querySelector('[onclick="rotateAllIps()"]');
+  if (btn) { btn.disabled = true; btn.classList.add('opacity-60', 'cursor-wait'); }
+
+  const routersToRotate = [];
+  if (_mrFilter === 'all') {
+    for (const key of Object.keys(_mrAllData)) routersToRotate.push(parseInt(key));
+  } else {
+    routersToRotate.push(parseInt(_mrFilter));
+  }
+
+  const tbody = document.getElementById('proxy-tbody');
+  routersToRotate.forEach(rIdx => {
+    const rows = tbody.querySelectorAll('tr[data-iface][data-router="' + rIdx + '"]');
+    rows.forEach(row => {
+      if (row.dataset.iface === 'pppoe-out1') return;
+      updateRowRotating(row.dataset.iface, rIdx);
+    });
+  });
+
+  let totalChanged = 0, totalTotal = 0;
+  showToast('warn', 'Đang xoay tất cả IP...', routersToRotate.length + ' router');
+
+  for (const rIdx of routersToRotate) {
+    const d = _mrAllData[rIdx];
+    if (!d) continue;
+    const creds = { host: d.router.host, username: d.router.username, password: d.router.password };
+    try {
+      const res = await fetch(API + '/mikrotik/rotate-all-ips', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(creds),
+      });
+      if (!res.ok) continue;
+      const data = await res.json();
+      const results = data.results || [];
+      totalTotal += results.length;
+      results.forEach(r => {
+        if (r.new_ip && r.old_ip && r.old_ip !== r.new_ip) {
+          totalChanged++;
+          showOldIpStrikethrough(r.interface, r.old_ip, r.new_ip, rIdx);
+        }
+      });
+    } catch(_) {}
+  }
+
+  if (btn) { btn.disabled = false; btn.classList.remove('opacity-60', 'cursor-wait'); }
+  showToast('success', 'Xoay IP hoàn tất', totalChanged + '/' + totalTotal + ' IP đã đổi trên ' + routersToRotate.length + ' router');
+  startLivePoll();
+}
+
+function updateRowRotating(iface, routerIdx) {
+  const sel = routerIdx !== undefined
+    ? '#proxy-tbody tr[data-iface="' + CSS.escape(iface) + '"][data-router="' + routerIdx + '"]'
+    : '#proxy-tbody tr[data-iface="' + CSS.escape(iface) + '"]';
+  const row = document.querySelector(sel);
+  if (!row) return;
+  const ipCell = row.querySelector('.poll-ip');
+  const statusCell = row.querySelector('.poll-status');
+  if (ipCell) {
+    const currentIp = ipCell.textContent.trim();
+    if (currentIp && currentIp !== '—' && !currentIp.includes('xoay') && !currentIp.includes('Chờ')) {
+      row.dataset.oldIp = currentIp;
+    }
+    ipCell.innerHTML = '<div class="flex flex-col"><span class="inline-flex items-center gap-1.5 text-amber-500 text-sm font-bold"><span class="material-symbols-outlined text-sm animate-spin">sync</span> Đang xoay...</span></div>';
+  }
+  if (statusCell) {
+    statusCell.innerHTML = '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-xs font-bold"><span class="size-1.5 rounded-full bg-amber-500 animate-pulse"></span> Đang xoay...</span>';
+  }
+}
+
+function showOldIpStrikethrough(iface, oldIp, newIp, routerIdx) {
+  const sel = routerIdx !== undefined
+    ? '#proxy-tbody tr[data-iface="' + CSS.escape(iface) + '"][data-router="' + routerIdx + '"]'
+    : '#proxy-tbody tr[data-iface="' + CSS.escape(iface) + '"]';
+  const row = document.querySelector(sel);
+  if (!row) return;
+  const ipCell = row.querySelector('.poll-ip');
+  if (!ipCell || !oldIp || oldIp === newIp) return;
+
+  const key = (routerIdx !== undefined ? routerIdx + ':' : '') + iface;
+  _strikethrough.add(key);
+  const oldId = 'old-ip-' + key.replace(/[^a-zA-Z0-9-]/g, '_');
+  ipCell.innerHTML = '<div class="flex flex-col gap-0.5">' +
+    '<span class="text-sm font-bold text-blue-600 dark:text-blue-400">' + newIp + '</span>' +
+    '<span id="' + oldId + '" class="text-xs text-slate-400 line-through" style="transition:opacity 1s ease">' + oldIp + '</span>' +
+    '</div>';
+
+  setTimeout(() => {
+    const oldEl = document.getElementById(oldId);
+    if (oldEl) {
+      oldEl.style.opacity = '0';
+      setTimeout(() => {
+        _strikethrough.delete(key);
+        const r = document.querySelector(sel);
+        if (!r) return;
+        const cell = r.querySelector('.poll-ip');
+        if (cell) {
+          cell.innerHTML = '<div class="flex flex-col"><span class="text-sm font-bold text-blue-600 dark:text-blue-400">' + newIp + '</span></div>';
+        }
+      }, 1000);
+    } else {
+      _strikethrough.delete(key);
+    }
+  }, 30000);
+}
+
+function startPolling() {
+  if (_pollTimer) return;
+  _pollTimer = setInterval(pollStatus, 3000);
+}
+
+function stopPolling() {
+  if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
+}
+
+async function pollStatus() {
+  if (!_mkCreds) return;
+  try {
+    const res = await fetch(API + '/mikrotik/pppoe-status', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(_mkCreds),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const clients = data.clients || [];
+    const tbody = document.getElementById('proxy-tbody');
+    const rows = tbody.querySelectorAll('tr[data-iface]');
+    rows.forEach(row => {
+      const name = row.dataset.iface;
+      const info = clients.find(c => c.name === name);
+      if (!info) return;
+      const ipCell = row.querySelector('.poll-ip');
+      const statusCell = row.querySelector('.poll-status');
+      const hasStrike = _strikethrough.has(name);
+      if (info.disabled) {
+        row.classList.add('opacity-50');
+        if (ipCell && !hasStrike) ipCell.innerHTML = '<div class="flex flex-col"><span class="text-sm font-bold text-slate-400">—</span></div>';
+        if (statusCell) statusCell.innerHTML = '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 text-xs font-bold"><span class="size-1.5 rounded-full bg-slate-400"></span> Đang tắt</span>';
+      } else if (info.running && info.ip) {
+        row.classList.remove('opacity-50');
+        if (ipCell && !hasStrike) ipCell.innerHTML = '<div class="flex flex-col"><span class="text-sm font-bold text-blue-600 dark:text-blue-400">' + info.ip + '</span></div>';
+        if (statusCell) statusCell.innerHTML = '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 text-xs font-bold"><span class="size-1.5 rounded-full bg-emerald-500"></span> Trực tuyến</span>';
+      } else {
+        row.classList.remove('opacity-50');
+        if (ipCell && !hasStrike) ipCell.innerHTML = '<div class="flex flex-col"><span class="inline-flex items-center gap-1.5 text-amber-500 text-sm font-bold"><span class="material-symbols-outlined text-sm animate-spin">sync</span> Đang xoay...</span></div>';
+        if (statusCell) statusCell.innerHTML = '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-xs font-bold"><span class="size-1.5 rounded-full bg-amber-500 animate-pulse"></span> Chờ IP...</span>';
+      }
+    });
+  } catch (_) {}
+}
+
+async function restartContainer(containerId, ifaceName) {
+  if (!_mkCreds) { showToast('warn', 'Chưa kết nối', 'Vui lòng kết nối HT Proxy trước'); return; }
+  showToast('warn', 'Đang restart...', 'Container ' + ifaceName + ' — vui lòng chờ...');
+  try {
+    const res = await fetch(API + '/mikrotik/restart-container?container_id=' + encodeURIComponent(containerId), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(_mkCreds),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      const st = data.container_status || 'unknown';
+      if (st === 'running') {
+        showToast('success', 'Restart thành công', ifaceName + ' đang chạy');
+      } else {
+        showToast('warn', 'Restart xong', ifaceName + ' trạng thái: ' + st);
+      }
+      setTimeout(() => refreshTable(), 3000);
+    } else {
+      showToast('error', 'Restart thất bại', data.detail || 'Lỗi không xác định');
+    }
+  } catch (e) {
+    showToast('error', 'Lỗi', 'Không thể gọi API restart');
+  }
+}
+
+async function restartAllContainers() {
+  if (_mrActive && Object.keys(_mrAllData).length > 0) {
+    await mrRestartAll();
+    return;
+  }
+  if (!_mkCreds) { showToast('warn', 'Chưa kết nối', 'Vui lòng kết nối HT Proxy trước'); return; }
+  const btn = document.getElementById('btn-restart-all');
+  btn.disabled = true;
+  btn.classList.add('opacity-60', 'cursor-wait');
+  btn.innerHTML = '<span class="material-symbols-outlined text-base animate-spin">restart_alt</span> Đang restart...';
+
+  showToast('warn', 'Restart tất cả Proxy', 'Đang stop → chờ → start tất cả container. Vui lòng chờ...');
+  try {
+    const res = await fetch(API + '/mikrotik/restart-all-containers', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(_mkCreds),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      const total = data.total || 0;
+      const allOk = data.all_running;
+      if (allOk) {
+        showToast('success', 'Restart thành công!', total + ' container đều đang chạy');
+      } else {
+        const failed = (data.results || []).filter(r => r.status !== 'running').length;
+        showToast('warn', 'Restart xong', total + ' container, ' + failed + ' chưa running');
+      }
+      setTimeout(() => refreshTable(), 3000);
+    } else {
+      showToast('error', 'Restart thất bại', data.detail || 'Lỗi không xác định');
+    }
+  } catch (e) {
+    showToast('error', 'Lỗi', 'Không thể gọi API restart');
+  }
+  btn.innerHTML = '<span class="material-symbols-outlined text-base">restart_alt</span> Restart Proxy';
+  btn.disabled = false;
+  btn.classList.remove('opacity-60', 'cursor-wait');
+}
+
+async function mrRestartAll() {
+  const btn = document.getElementById('btn-restart-all');
+  btn.disabled = true;
+  btn.classList.add('opacity-60', 'cursor-wait');
+  btn.innerHTML = '<span class="material-symbols-outlined text-base animate-spin">restart_alt</span> Đang restart...';
+
+  const routersToRestart = [];
+  if (_mrFilter === 'all') {
+    for (const key of Object.keys(_mrAllData)) routersToRestart.push(parseInt(key));
+  } else {
+    routersToRestart.push(parseInt(_mrFilter));
+  }
+
+  showToast('warn', 'Restart tất cả Proxy', routersToRestart.length + ' router');
+  let totalOk = 0;
+  for (const rIdx of routersToRestart) {
+    const d = _mrAllData[rIdx];
+    if (!d) continue;
+    const creds = { host: d.router.host, username: d.router.username, password: d.router.password };
+    try {
+      const res = await fetch(API + '/mikrotik/restart-all-containers', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(creds),
+      });
+      if (res.ok) totalOk++;
+    } catch(_) {}
+  }
+  showToast('success', 'Restart xong', totalOk + '/' + routersToRestart.length + ' router');
+  btn.innerHTML = '<span class="material-symbols-outlined text-base">restart_alt</span> Restart Proxy';
+  btn.disabled = false;
+  btn.classList.remove('opacity-60', 'cursor-wait');
+  setTimeout(() => refreshTable(), 3000);
+}
+
+// --- Modal doi mat khau ---
+let _pwdMode = 'manual';
+let _pwdTarget = null;
+let _pwdRouterIdx = undefined;
+
+function openPwdModal(envlist, containerId, name, routerIdx) {
+  if (!_mkCreds && !(_mrActive && Object.keys(_mrAllData).length > 0)) { showToast('warn', 'Chưa kết nối', 'Vui lòng kết nối HT Proxy trước'); return; }
+  _pwdRouterIdx = routerIdx;
+  if (envlist) {
+    _pwdTarget = { envlist, container_id: containerId, name };
+    document.getElementById('pwd-modal-sub').textContent = name || envlist;
+  } else {
+    _pwdTarget = null;
+    document.getElementById('pwd-modal-sub').textContent = 'Tất cả Proxy';
+  }
+  setPwdMode('manual');
+  document.getElementById('pwd-new-login').value = '';
+  document.getElementById('pwd-new-pass').value = '';
+  document.getElementById('pwd-modal').classList.remove('hidden');
+}
+
+function closePwdModal() {
+  document.getElementById('pwd-modal').classList.add('hidden');
+  _pwdTarget = null;
+}
+
+function setPwdMode(mode) {
+  _pwdMode = mode;
+  const tabs = { manual: 'tab-manual', random: 'tab-random', clear: 'tab-clear' };
+  const fields = { manual: 'pwd-manual-fields', random: 'pwd-random-fields', clear: 'pwd-clear-fields' };
+  const active = 'border-primary bg-primary/10 text-primary';
+  const inactive = 'border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300';
+  for (const [k, id] of Object.entries(tabs)) {
+    const el = document.getElementById(id);
+    el.className = el.className.replace(/border-\S+|bg-\S+|text-\S+/g, '').trim();
+    el.className = 'flex-1 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 border-2 ' + (k === mode ? active : inactive);
+  }
+  for (const [k, id] of Object.entries(fields)) {
+    document.getElementById(id).classList.toggle('hidden', k !== mode);
+  }
+  if (mode === 'random') genRandomPreview();
+}
+
+function genRandomPreview() {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const randStr = (n) => Array.from({ length: n }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  document.getElementById('pwd-rand-login').textContent = 'htproxy' + randStr(4);
+  document.getElementById('pwd-rand-pass').textContent = randStr(13);
+}
+
+async function confirmChangePwd() {
+  const btn = document.getElementById('pwd-confirm-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="material-symbols-outlined text-base animate-spin">sync</span> Đang xử lý...';
+
+  let creds = _mkCreds;
+  if (_mrActive && _pwdRouterIdx !== undefined && _mrList[_pwdRouterIdx]) {
+    const r = _mrList[_pwdRouterIdx];
+    creds = { host: r.host, username: r.username, password: r.password };
+  } else if (_mrActive && _mrFilter !== 'all' && _mrList[_mrFilter]) {
+    const r = _mrList[_mrFilter];
+    creds = { host: r.host, username: r.username, password: r.password };
+  }
+  if (!creds) { showToast('warn', 'Chưa chọn router', 'Vui lòng chọn router cụ thể'); btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined text-base">check</span> Xác nhận & Restart'; return; }
+  const body = { ...creds, mode: _pwdMode };
+  if (_pwdMode === 'manual') {
+    body.proxy_login = document.getElementById('pwd-new-login').value.trim();
+    body.proxy_password = document.getElementById('pwd-new-pass').value.trim();
+    if (!body.proxy_login && !body.proxy_password) {
+      showToast('warn', 'Thiếu thông tin', 'Vui lòng nhập user hoặc password');
+      btn.disabled = false;
+      btn.innerHTML = '<span class="material-symbols-outlined text-base">check</span> Xác nhận & Restart';
+      return;
+    }
+  }
+
+  let url;
+  if (_pwdTarget) {
+    body.envlist = _pwdTarget.envlist;
+    body.container_id = _pwdTarget.container_id;
+    url = API + '/mikrotik/change-proxy-creds';
+  } else {
+    url = API + '/mikrotik/change-all-proxy-creds';
+  }
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      closePwdModal();
+      if (_pwdTarget) {
+        const st = data.container_status || '';
+        showToast(st === 'running' ? 'success' : 'warn',
+          'Đổi mật khẩu thành công',
+          (_pwdTarget.name || '') + ': ' + (data.new_login || '(trống)') + ' / ' + (data.new_password || '(trống)'));
+      } else {
+        const allOk = data.all_running;
+        showToast(allOk ? 'success' : 'warn',
+          'Đổi mật khẩu tất cả',
+          data.total + ' proxy đã cập nhật' + (allOk ? ' & đang chạy' : ''));
+      }
+      setTimeout(() => refreshTable(), 3000);
+    } else {
+      showToast('error', 'Lỗi', data.detail || 'Không thể đổi mật khẩu');
+    }
+  } catch (e) {
+    showToast('error', 'Lỗi', 'Không thể gọi API');
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<span class="material-symbols-outlined text-base">check</span> Xác nhận & Restart';
+}
+
+document.getElementById('btn-connect').addEventListener('click', function() {
+  if (_connected) { doDisconnect(); } else { doConnect(); }
+});
+document.getElementById('mk-pass').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !_connected) doConnect();
+});
+
+(function loadSaved() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('mk_saved'));
+    if (saved && saved.host) {
+      document.getElementById('mk-host').value = saved.host;
+      document.getElementById('mk-user').value = saved.username || '';
+      document.getElementById('mk-pass').value = saved.password || '';
+      document.getElementById('chk-save').checked = true;
+      document.getElementById('chk-auto').checked = localStorage.getItem('mk_auto') === '1';
+    }
+  } catch (_) {}
+
+  if (restoreSession()) return;
+  setTimeout(() => restoreMultiMode(), 300);
+})();
+
+document.getElementById('chk-auto').addEventListener('change', function() {
+  localStorage.setItem('mk_auto', this.checked ? '1' : '');
+});
+
+(function syncUserHeader() {
+  try {
+    const p = window.parent;
+    const el = document.getElementById('header-user-name');
+    if (el && p && p._userName) el.textContent = p._userName;
+    else if (el) el.textContent = localStorage.getItem('ht_user_name') || '...';
+    const tier = (p?._licenseTier || localStorage.getItem('ht_license_tier') || 'personal').toLowerCase();
+    const badge = document.getElementById('header-tier-badge');
+    if (badge) {
+      badge.textContent = tier === 'business' ? 'Business' : tier === 'test' ? 'Test' : 'Personal';
+      badge.title = tier === 'business' ? 'Business' : tier === 'test' ? 'Test' : 'Personal';
+      badge.className = 'tier-badge shrink-0 px-2 py-1 rounded-lg text-[9px] font-bold transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-default ' +
+        (tier === 'business' ? 'tier-business bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-md dark:from-violet-600 dark:to-purple-700 dark:shadow-violet-900/30' :
+         tier === 'test' ? 'tier-test bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-md dark:from-amber-500 dark:to-orange-600' :
+         'tier-personal bg-gradient-to-r from-slate-400 to-slate-600 text-white shadow-md dark:from-slate-500 dark:to-slate-700 dark:shadow-slate-800/50');
+    }
+  } catch(_) {}
+})();
+
+let _pageHasBeenHidden = false;
+let _lastAutoConnectTime = 0;
+window.addEventListener('beforeunload', function() {
+  if (_connected) saveSession();
+});
+
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'hidden') {
+    _pageHasBeenHidden = true;
+    if (_connected) saveSession();
+    return;
+  }
+  if (!_pageHasBeenHidden) return;
+  _pageHasBeenHidden = false;
+});
+
+function toggleDropdown(id) {
+  const el = document.getElementById(id);
+  const allMenus = document.querySelectorAll('#dl-menu, #cp-menu');
+  allMenus.forEach(m => { if (m.id !== id) m.classList.add('hidden'); });
+  el.classList.toggle('hidden');
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#dl-wrap') && !e.target.closest('#cp-wrap')) {
+    document.querySelectorAll('#dl-menu, #cp-menu').forEach(m => m.classList.add('hidden'));
+  }
+});
+
+function buildAllExport() {
+  const defaultHost = _mkCreds ? _mkCreds.host : '';
+  const clients = (_lastClients || []).filter(c => c.status === 'online' || c.status === 'offline');
+  const sections = [];
+  sections.push('=== HOST:HTTP (host:port:user:pass) ===');
+  clients.forEach(c => {
+    const h = c._host || defaultHost;
+    sections.push(h + ':' + c.http_port + ':' + (c.proxy_login||'') + ':' + (c.proxy_password||''));
+  });
+  sections.push('');
+  sections.push('=== IP:HTTP (ip:port:user:pass) ===');
+  clients.forEach(c => {
+    sections.push((c.ip||'') + ':' + c.http_port + ':' + (c.proxy_login||'') + ':' + (c.proxy_password||''));
+  });
+  sections.push('');
+  sections.push('=== HOST:SOCKS (host:port:user:pass) ===');
+  clients.forEach(c => {
+    const h = c._host || defaultHost;
+    sections.push(h + ':' + c.socks_port + ':' + (c.proxy_login||'') + ':' + (c.proxy_password||''));
+  });
+  sections.push('');
+  sections.push('=== IP:SOCKS (ip:port:user:pass) ===');
+  clients.forEach(c => {
+    sections.push((c.ip||'') + ':' + c.socks_port + ':' + (c.proxy_login||'') + ':' + (c.proxy_password||''));
+  });
+  const apiLinks = buildApiRotateLinks();
+  if (apiLinks.length > 0 && !apiLinks[0].startsWith('Chưa')) {
+    sections.push('');
+    sections.push('=== API ROTATE LINKS ===');
+    apiLinks.forEach(l => sections.push(l));
+  }
+  return sections;
+}
+
+function quickExport(fmt, action) {
+  document.querySelectorAll('#dl-menu, #cp-menu').forEach(m => m.classList.add('hidden'));
+  if (!_lastClients || _lastClients.length === 0) {
+    showToast('warn', 'Chưa kết nối', 'Kết nối router trước');
+    return;
+  }
+  const lines = fmt === 'all' ? buildAllExport() : buildExportLines(fmt);
+  if (lines.length === 0) { showToast('warn', 'Không có proxy', ''); return; }
+  const text = lines.join('\n');
+  const count = (_lastClients || []).filter(c => c.status === 'online' || c.status === 'offline').length;
+  const now = new Date();
+  const dd = String(now.getDate()).padStart(2,'0');
+  const mm = String(now.getMonth()+1).padStart(2,'0');
+  const yyyy = now.getFullYear();
+
+  if (action === 'download') {
+    const fname = 'HT_Proxy_' + dd + mm + yyyy + '_' + count + (fmt === 'all' ? '_full' : '_' + fmt) + '.txt';
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = fname;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    showToast('success', 'Đã tải về', fname);
+  } else {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('success', 'Đã copy', count + ' proxy — ' + (fmt === 'all' ? 'Full' : fmt));
+    }).catch(() => showToast('error', 'Lỗi', 'Không thể copy'));
+  }
+}
+
+let _exportAction = 'download';
+let _exportText = '';
+
+function openExportModal(action) {
+  if (!_lastClients || _lastClients.length === 0) {
+    showToast('warn', 'Không có dữ liệu', 'Vui lòng kết nối HT Proxy trước');
+    return;
+  }
+  _exportAction = action;
+  const modal = document.getElementById('export-modal');
+  const title = document.getElementById('export-modal-title');
+  if (action === 'copy') {
+    title.innerHTML = '<span class="material-symbols-outlined text-primary">content_copy</span> Copy Proxy';
+  } else {
+    title.innerHTML = '<span class="material-symbols-outlined text-primary">download</span> Tải về Proxy';
+  }
+  document.getElementById('export-preview').classList.add('hidden');
+  modal.classList.remove('hidden');
+}
+
+function closeExportModal() {
+  document.getElementById('export-modal').classList.add('hidden');
+}
+
+function buildExportLines(fmt) {
+  if (fmt === 'api_rotate') {
+    return buildApiRotateLinks();
+  }
+  const defaultHost = _mkCreds ? _mkCreds.host : '';
+  return _lastClients
+    .filter(c => c.status === 'online' || c.status === 'offline')
+    .map(c => {
+      const host = c._host || defaultHost;
+      const addr = fmt.startsWith('ip') ? (c.ip || '') : host;
+      const port = fmt.endsWith('socks') ? c.socks_port : c.http_port;
+      const user = c.proxy_login || '';
+      const pass = c.proxy_password || '';
+      return addr + ':' + port + ':' + user + ':' + pass;
+    })
+    .filter(l => !l.startsWith(':'));
+}
+
+function buildApiRotateLinks() {
+  const apiHost = localStorage.getItem('api_host') || '';
+  if (!apiHost) return ['Chưa cấu hình API server. Vào tab API để kết nối.'];
+
+  let token = '';
+  try {
+    const saved = localStorage.getItem('_api_token');
+    if (saved) token = saved;
+  } catch(_) {}
+
+  const defaultHost = _mkCreds ? _mkCreds.host : '';
+  const links = [];
+  const clients = _lastClients.filter(c => c.status === 'online' || c.status === 'offline');
+  clients.forEach(c => {
+    const name = c.name || c.interface || '';
+    if (!name || name === 'pppoe-out1') return;
+    const rHost = c._host || defaultHost;
+    links.push(apiHost + '/api/' + name + '/' + rHost + '/' + (token || 'TOKEN'));
+  });
+  return links;
+}
+
+function doExport(fmt) {
+  const lines = buildExportLines(fmt);
+  if (lines.length === 0) {
+    showToast('warn', 'Không có proxy', 'Không có proxy online để xuất');
+    return;
+  }
+  _exportText = lines.join('\n');
+
+  const previewEl = document.getElementById('export-preview');
+  document.getElementById('export-preview-text').textContent = _exportText;
+  previewEl.classList.remove('hidden');
+
+  if (_exportAction === 'download') {
+    const fmtLabel = { host_http: 'host_http', ip_http: 'ip_http', host_socks: 'host_socks', ip_socks: 'ip_socks' };
+    const filename = 'proxy_' + (fmtLabel[fmt] || fmt) + '_' + new Date().toISOString().slice(0,10) + '.txt';
+    const blob = new Blob([_exportText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('success', 'Đã tải về', filename + ' — ' + lines.length + ' proxy');
+  } else {
+    navigator.clipboard.writeText(_exportText).then(() => {
+      showToast('success', 'Đã copy', lines.length + ' proxy đã copy vào clipboard');
+    }).catch(() => {
+      showToast('error', 'Lỗi', 'Không thể copy vào clipboard');
+    });
+  }
+}
+
+function copyPreview() {
+  if (!_exportText) return;
+  navigator.clipboard.writeText(_exportText).then(() => {
+    showToast('success', 'Đã copy', 'Nội dung đã copy vào clipboard');
+  }).catch(() => {
+    showToast('error', 'Lỗi', 'Không thể copy vào clipboard');
+  });
+}
+
+function _doSyncMk(mkData) {
+  const u = _fbUser || _fbAuth?.currentUser;
+  if (!u || !_fbDb) return false;
+  const ref = _fbDb.collection('users').doc(u.uid);
+  ref.get().then(snap => {
+    const existing = snap.exists ? (snap.data().mikrotik || {}) : {};
+    ref.update({ mikrotik: { ...existing, ...mkData } }).catch(() => {});
+  }).catch(() => {});
+  return true;
+}
+
+let _pendingMkSync = null;
+function syncMikrotikToFirestore(mkData) {
+  _pendingMkSync = mkData;
+  if (_doSyncMk(mkData)) { _pendingMkSync = null; return; }
+  if (_fbAuth) {
+    const unsub = _fbAuth.onAuthStateChanged(u => {
+      unsub();
+      if (u && _pendingMkSync) { _doSyncMk(_pendingMkSync); _pendingMkSync = null; }
+    });
+  }
+}
+
+function loadMrList() { try { _mrList = JSON.parse(localStorage.getItem('multi_routers') || '[]'); } catch(_) { _mrList = []; } }
+function saveMrList() { localStorage.setItem('multi_routers', JSON.stringify(_mrList)); }
+
+function toggleMultiRouter() {
+  const tier = (window.parent?._licenseTier || localStorage.getItem('ht_license_tier') || 'personal').toLowerCase();
+  if (tier === 'personal' && !_mrActive) {
+    document.getElementById('upgrade-business-modal').classList.remove('hidden');
+    return;
+  }
+  _mrActive = !_mrActive;
+  localStorage.setItem('mr_active', _mrActive ? '1' : '0');
+  applyMultiMode();
+}
+
+function applyMultiMode() {
+  const btn = document.getElementById('btn-multi-toggle');
+  if (_mrActive) {
+    loadMrList();
+    renderMrNodes();
+    document.getElementById('mr-panel').classList.remove('hidden');
+    document.getElementById('single-connect-box').classList.add('hidden');
+    btn.classList.add('ring-2', 'ring-violet-300');
+    btn.innerHTML = '<span class="material-symbols-outlined text-base">hub</span> Multi ON';
+  } else {
+    document.getElementById('mr-panel').classList.add('hidden');
+    document.getElementById('single-connect-box').classList.remove('hidden');
+    btn.classList.remove('ring-2', 'ring-violet-300');
+    btn.innerHTML = '<span class="material-symbols-outlined text-base">hub</span> Multi';
+    _mrAllData = {};
+    _mrFilter = 'all';
+  }
+}
+
+function saveMrAutoConnect() {
+  localStorage.setItem('mr_auto_connect', document.getElementById('chk-auto-mr').checked ? '1' : '0');
+}
+
+function restoreMultiMode() {
+  if (localStorage.getItem('mr_active') === '1') {
+    _mrActive = true;
+    applyMultiMode();
+    loadMrList();
+    renderMrNodes();
+    const autoEl = document.getElementById('chk-auto-mr');
+    if (autoEl) autoEl.checked = localStorage.getItem('mr_auto_connect') === '1';
+    if (localStorage.getItem('mr_auto_connect') === '1' && _mrList.length > 0) {
+      setTimeout(() => mrConnectAll(), 500);
+    }
+  }
+}
+
+function openAddRouter() { document.getElementById('add-router-modal').classList.remove('hidden'); setTimeout(() => document.getElementById('ar-host').focus(), 100); }
+function openBatchImport() {
+  document.getElementById('batch-input').value = '';
+  document.getElementById('batch-preview').textContent = '0 router sẽ được thêm';
+  document.getElementById('batch-import-modal').classList.remove('hidden');
+  document.getElementById('batch-input').addEventListener('input', function() {
+    const lines = this.value.split('\n').filter(l => l.trim().split(':').length >= 3);
+    document.getElementById('batch-preview').textContent = lines.length + ' router sẽ được thêm';
+  });
+}
+
+function saveAddRouter() {
+  const host = document.getElementById('ar-host').value.trim();
+  const user = document.getElementById('ar-user').value.trim();
+  const pass = document.getElementById('ar-pass').value.trim();
+  const note = document.getElementById('ar-note').value.trim();
+  if (!host || !user) { showToast('warn', 'Thiếu thông tin', 'Nhập host và username'); return; }
+  _mrList.push({ id: 'r_' + Date.now(), host, username: user, password: pass, note, status: 'unknown', identity: '', uptime: '', proxy_count: 0 });
+  saveMrList();
+  document.getElementById('add-router-modal').classList.add('hidden');
+  ['ar-host','ar-user','ar-pass','ar-note'].forEach(id => document.getElementById(id).value = '');
+  renderMrNodes();
+  showToast('success', 'Đã thêm', host);
+}
+
+function openMrEditModal() {
+  if (_mrList.length === 0) { showToast('warn', 'Chưa có router', 'Thêm hoặc nhập router trước'); return; }
+  const modal = document.getElementById('edit-router-modal');
+  const listEl = document.getElementById('er-router-list');
+  listEl.innerHTML = _mrList.map((r, i) => {
+    const name = enc_mr(r.note || r.identity || r.host);
+    const host = enc_mr(r.host);
+    const statusDot = r.online ? 'bg-emerald-400' : 'bg-slate-300';
+    return '<button type="button" onclick="selectEditRouter(' + i + ')" class="er-item w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-slate-700 flex items-center gap-3 transition-colors" data-idx="' + i + '">' +
+      '<span class="w-2 h-2 rounded-full ' + statusDot + ' flex-shrink-0"></span>' +
+      '<div class="flex-1 min-w-0"><span class="font-semibold text-sm block truncate">' + name + '</span><span class="text-[11px] text-slate-400 block truncate">' + host + '</span></div>' +
+      '<span class="material-symbols-outlined text-slate-300 text-lg">chevron_right</span>' +
+    '</button>';
+  }).join('');
+  document.getElementById('er-placeholder').classList.remove('hidden');
+  document.getElementById('er-form-content').classList.add('hidden');
+  _editingRouterIdx = -1;
+  document.querySelectorAll('.er-item').forEach(el => el.classList.remove('bg-amber-50','dark:bg-amber-900/20'));
+  modal.classList.remove('hidden');
+}
+
+function selectEditRouter(idx) {
+  const r = _mrList[idx];
+  if (!r) return;
+  _editingRouterIdx = idx;
+  document.getElementById('er-host').value = r.host || '';
+  document.getElementById('er-user').value = r.username || '';
+  document.getElementById('er-pass').value = r.password || '';
+  document.getElementById('er-note').value = r.note || '';
+  document.getElementById('er-editing-name').textContent = r.note || r.identity || 'Router ' + (idx + 1);
+  document.getElementById('er-editing-host').textContent = r.host || '';
+  document.getElementById('er-placeholder').classList.add('hidden');
+  document.getElementById('er-form-content').classList.remove('hidden');
+  document.querySelectorAll('.er-item').forEach(el => {
+    el.classList.toggle('bg-amber-50', +el.dataset.idx === idx);
+    el.classList.toggle('dark:bg-amber-900/20', +el.dataset.idx === idx);
+  });
+  setTimeout(() => document.getElementById('er-host').focus(), 50);
+}
+
+function saveEditRouter() {
+  if (_editingRouterIdx < 0 || !_mrList[_editingRouterIdx]) return;
+  const host = document.getElementById('er-host').value.trim();
+  const user = document.getElementById('er-user').value.trim();
+  const pass = document.getElementById('er-pass').value;
+  const note = document.getElementById('er-note').value.trim();
+  if (!host || !user) { showToast('warn', 'Thiếu thông tin', 'Nhập host và username'); return; }
+  const r = _mrList[_editingRouterIdx];
+  r.host = host; r.username = user;
+  if (pass) r.password = pass;
+  r.note = note; r.identity = r.identity || '';
+  saveMrList();
+  renderMrNodes();
+  if (_mrActive && Object.keys(_mrAllData).length > 0) renderMultiTable();
+  showToast('success', 'Đã lưu', host);
+  openMrEditModal();
+}
+
+function deleteEditRouter() {
+  if (_editingRouterIdx < 0 || !_mrList[_editingRouterIdx]) return;
+  const name = _mrList[_editingRouterIdx].note || _mrList[_editingRouterIdx].host;
+  if (!confirm('Xóa "' + name + '" khỏi danh sách?')) return;
+  _mrList.splice(_editingRouterIdx, 1);
+  saveMrList(); renderMrNodes();
+  if (_mrActive && Object.keys(_mrAllData).length > 0) renderMultiTable();
+  showToast('success', 'Đã xóa', name);
+  if (_mrList.length > 0) { openMrEditModal(); } else { document.getElementById('edit-router-modal').classList.add('hidden'); }
+}
+
+async function testEditRouter() {
+  if (_editingRouterIdx < 0) return;
+  const host = document.getElementById('er-host').value.trim();
+  const user = document.getElementById('er-user').value.trim();
+  const pass = document.getElementById('er-pass').value || _mrList[_editingRouterIdx]?.password || '';
+  if (!host || !user) { showToast('warn', 'Thiếu thông tin', 'Nhập host và username'); return; }
+  const btn = document.getElementById('er-test-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="material-symbols-outlined text-lg animate-spin">progress_activity</span> Đang test...';
+  try {
+    const res = await fetch(API + '/mikrotik/test', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ host, username: user, password: pass }),
+    });
+    const data = await res.json();
+    if (res.ok && data.connected) {
+      showToast('success', 'Kết nối thành công', (data.identity || host) + ' — v' + (data.version || '') + ' — Uptime: ' + (data.uptime || ''));
+      btn.innerHTML = '<span class="material-symbols-outlined text-lg">check_circle</span> OK';
+      btn.classList.remove('bg-blue-50', 'text-blue-600', 'border-blue-200');
+      btn.classList.add('bg-emerald-50', 'text-emerald-600', 'border-emerald-200');
+    } else {
+      showToast('error', 'Kết nối thất bại', data.error || data.detail || 'Không thể kết nối router');
+      btn.innerHTML = '<span class="material-symbols-outlined text-lg">error</span> Lỗi';
+      btn.classList.remove('bg-blue-50', 'text-blue-600', 'border-blue-200');
+      btn.classList.add('bg-red-50', 'text-red-600', 'border-red-200');
+    }
+  } catch (e) {
+    showToast('error', 'Lỗi kết nối', 'Không thể gọi API backend');
+    btn.innerHTML = '<span class="material-symbols-outlined text-lg">error</span> Lỗi';
+    btn.classList.remove('bg-blue-50', 'text-blue-600', 'border-blue-200');
+    btn.classList.add('bg-red-50', 'text-red-600', 'border-red-200');
+  }
+  btn.disabled = false;
+  setTimeout(() => {
+    btn.innerHTML = '<span class="material-symbols-outlined text-lg">wifi_tethering</span> Test';
+    btn.className = 'py-2.5 px-4 bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-1';
+  }, 3000);
+}
+
+function doBatchImport() {
+  const text = document.getElementById('batch-input').value;
+  const lines = text.split('\n').filter(l => l.trim());
+  let added = 0;
+  for (const line of lines) {
+    const parts = line.trim().split(':');
+    if (parts.length < 3) continue;
+    const [host, user, pass, ...rest] = parts;
+    if (!host.trim() || !user.trim()) continue;
+    _mrList.push({ id: 'r_' + Date.now() + '_' + added, host: host.trim(), username: user.trim(), password: pass.trim(), note: rest.join(':').trim() || host.trim(), status: 'unknown', identity: '', uptime: '', proxy_count: 0 });
+    added++;
+  }
+  saveMrList();
+  document.getElementById('batch-import-modal').classList.add('hidden');
+  renderMrNodes();
+  showToast('success', 'Đã nhập', added + ' router');
+}
+
+function enc_mr(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function mrTestOne(idx, retries) {
+  const r = _mrList[idx]; if (!r) return;
+  const maxRetries = retries || 2;
+  r.status = 'testing'; renderMrNodes();
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      if (attempt > 0) await new Promise(ok => setTimeout(ok, 1500));
+      const res = await fetch(API + '/mikrotik/test', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ host: r.host, username: r.username, password: r.password }),
+      });
+      const data = await res.json();
+      if (data.connected) {
+        r.status = 'online';
+        r.identity = data.identity || r.identity || '';
+        if (!r.note) r.note = r.host;
+        r.uptime = data.uptime || '';
+        await new Promise(ok => setTimeout(ok, 500));
+        try {
+          const prx = await fetch(API + '/mikrotik/pppoe-status', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ host: r.host, username: r.username, password: r.password }) });
+          if (prx.ok) { const pd = await prx.json(); r.proxy_count = (pd.clients || []).length; }
+        } catch(_){}
+        break;
+      } else {
+        r.status = 'offline';
+        r._lastError = data.error || '';
+        if (attempt === maxRetries - 1) r.identity = r.identity || r.note || r.host;
+      }
+    } catch(e) {
+      r.status = 'offline';
+      r._lastError = e.message || '';
+      if (attempt === maxRetries - 1) r.identity = r.identity || r.note || r.host;
+    }
+  }
+  saveMrList(); renderMrNodes();
+}
+
+async function mrTestAll() {
+  if (_mrList.length === 0) { showToast('warn', 'Chưa có router', ''); return; }
+  showToast('warn', 'Đang test...', _mrList.length + ' router');
+  for (let i = 0; i < _mrList.length; i++) {
+    await mrTestOne(i, 3);
+    if (i < _mrList.length - 1) await new Promise(ok => setTimeout(ok, 800));
+  }
+  const online = _mrList.filter(r => r.status === 'online').length;
+  showToast('success', 'Hoàn tất', online + '/' + _mrList.length + ' online');
+}
+
+async function mrConnectAll() {
+  let onlineRouters = _mrList.filter(r => r.status === 'online');
+  if (onlineRouters.length === 0) {
+    await mrTestAll();
+    onlineRouters = _mrList.filter(r => r.status === 'online');
+    if (onlineRouters.length === 0) {
+      showToast('error', 'Không có router online', 'Kiểm tra lại kết nối router');
+      return;
+    }
+  }
+  document.getElementById('btn-connect-all').innerHTML = '<span class="material-symbols-outlined text-xs animate-spin">sync</span> Đang kết nối...';
+  _mrAllData = {};
+  let totalClients = 0;
+  let connIdx = 0;
+  for (let i = 0; i < _mrList.length; i++) {
+    const r = _mrList[i];
+    if (r.status !== 'online') continue;
+    if (connIdx > 0) await new Promise(ok => setTimeout(ok, 600));
+    connIdx++;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        if (attempt > 0) await new Promise(ok => setTimeout(ok, 1500));
+        const res = await fetch(API + '/mikrotik/pppoe-clients', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ host: r.host, username: r.username, password: r.password }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          _mrAllData[i] = { router: r, clients: data.clients || [], host: data.host || r.host };
+          r.proxy_count = (data.clients || []).length;
+          totalClients += r.proxy_count;
+          break;
+        }
+      } catch(_) {}
+    }
+  }
+  saveMrList();
+  document.getElementById('btn-connect-all').innerHTML = '<span class="material-symbols-outlined text-xs">check_circle</span> Đã kết nối';
+  document.getElementById('btn-disconnect-all').classList.remove('hidden');
+  _mrFilter = 'all';
+  _connected = true;
+  renderMultiTable();
+  renderMrNodes();
+  startLivePoll();
+  saveSession();
+  showToast('success', 'Kết nối tất cả', Object.keys(_mrAllData).length + ' router, ' + totalClients + ' proxy');
+  setTimeout(restoreSchedule, 1500);
+}
+
+function mrDisconnectAll() {
+  _mrAllData = {};
+  _mrFilter = 'all';
+  _connected = false;
+  stopLivePoll();
+  stopSchedule();
+  clearSession();
+  document.getElementById('btn-connect-all').innerHTML = '<span class="material-symbols-outlined text-xs">bolt</span> Kết nối tất cả';
+  document.getElementById('btn-disconnect-all').classList.add('hidden');
+  const tbody = document.getElementById('proxy-tbody');
+  tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-12 text-center text-slate-400 text-sm">Nhấn "Kết nối tất cả" để hiện proxy</td></tr>';
+  updateStats(0, 0, 0);
+  document.getElementById('header-status').className = 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all';
+  document.getElementById('header-status').textContent = 'Chưa kết nối';
+  renderMrNodes();
+  showToast('warn', 'Đã ngắt kết nối', 'Tất cả router đã ngắt');
+}
+
+async function mrSelectRouter(idx) {
+  if (idx === 'all') {
+    _mrFilter = 'all';
+    _mkCreds = null;
+  } else {
+    _mrFilter = idx;
+    const r = _mrList[idx];
+    if (r) _mkCreds = { host: r.host, username: r.username, password: r.password };
+    if (r && !_mrAllData[idx]) {
+      await mrReconnectOne(idx);
+    }
+  }
+  renderMultiTable();
+  renderMrNodes();
+}
+
+async function mrReconnectOne(idx) {
+  const r = _mrList[idx]; if (!r) return;
+  const creds = { host: r.host, username: r.username, password: r.password };
+  showToast('warn', 'Đang kết nối...', r.note || r.host);
+  try {
+    const testRes = await fetch(API + '/mikrotik/test', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(creds),
+    });
+    const testData = await testRes.json();
+    if (!testData.connected) {
+      r.status = 'offline'; r._lastError = testData.error || '';
+      saveMrList(); renderMrNodes();
+      showToast('error', 'Không thể kết nối', r.note || r.host);
+      return;
+    }
+    r.status = 'online';
+    if (testData.identity) r.identity = testData.identity;
+    r.uptime = testData.uptime || '';
+    await new Promise(ok => setTimeout(ok, 500));
+    const res = await fetch(API + '/mikrotik/pppoe-clients', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(creds),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      _mrAllData[idx] = { router: r, clients: data.clients || [], host: data.host || r.host };
+      r.proxy_count = (data.clients || []).length;
+      showToast('success', 'Đã kết nối', (r.note || r.host) + ' — ' + r.proxy_count + ' proxy');
+    }
+  } catch(e) {
+    showToast('error', 'Lỗi kết nối', e.message || '');
+  }
+  saveMrList(); renderMrNodes(); renderMultiTable();
+}
+
+function renderMultiTable() {
+  const tbody = document.getElementById('proxy-tbody');
+  let entries = [];
+  if (_mrFilter === 'all') {
+    for (const key of Object.keys(_mrAllData).sort((a,b) => a-b)) {
+      const d = _mrAllData[key];
+      entries.push({ type: 'header', router: d.router, idx: parseInt(key) });
+      (d.clients || []).forEach(c => entries.push({ type: 'row', client: c, host: d.host, routerIdx: parseInt(key) }));
+    }
+  } else {
+    const d = _mrAllData[_mrFilter];
+    if (d) {
+      entries.push({ type: 'header', router: d.router, idx: _mrFilter });
+      (d.clients || []).forEach(c => entries.push({ type: 'row', client: c, host: d.host, routerIdx: _mrFilter }));
+    }
+  }
+
+  if (entries.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-12 text-center text-slate-400 text-sm">Nhấn "Kết nối tất cả" để hiện proxy</td></tr>';
+    updateStats(0, 0, 0);
+    return;
+  }
+
+  const allClients = entries.filter(e => e.type === 'row');
+  const online = allClients.filter(e => e.client.status === 'online').length;
+  updateStats(allClients.length, online, allClients.length - online);
+  document.getElementById('pagination-text').textContent = 'Hiển thị ' + allClients.length + ' Proxy từ ' + (_mrFilter === 'all' ? Object.keys(_mrAllData).length + ' router' : _mrList[_mrFilter]?.host || '');
+
+  _lastClients = allClients.map(e => ({ ...e.client, _host: e.host }));
+
+  tbody.innerHTML = entries.map(e => {
+    if (e.type === 'header') {
+      const r = e.router;
+      const hSearch = [r.identity, r.host, r.note].filter(Boolean).join(' ');
+      return '<tr class="bg-violet-50 dark:bg-violet-900/20 border-t-2 border-violet-200 dark:border-violet-800" data-search="' + encAttr(hSearch) + '">' +
+        '<td colspan="7" class="px-4 py-2">' +
+          '<div class="flex items-center gap-2">' +
+            '<span class="material-symbols-outlined text-violet-500 text-base">router</span>' +
+            '<span class="text-xs font-bold text-violet-700 dark:text-violet-300">' + enc_mr(r.identity || r.host) + '</span>' +
+            '<span class="text-[10px] text-violet-400">(' + enc_mr(r.host) + ')</span>' +
+            '<span class="text-[10px] font-bold text-violet-500 bg-violet-100 dark:bg-violet-900/40 px-1.5 py-0.5 rounded-full ml-auto">' + (r.proxy_count || 0) + ' proxy</span>' +
+          '</div>' +
+        '</td></tr>';
+    }
+    const c = e.client;
+    const host = e.host;
+    const st = getStatusInfo(c);
+    const uid = 'pwd-mr-' + e.routerIdx + '-' + c.stt;
+    const rowCls = c.status === 'disabled' ? 'opacity-50' : '';
+    const isOut1 = c.name === 'pppoe-out1';
+    const rowSearch = [c.name, c.ip, host, c.http_port, c.socks_port, c.proxy_login, st.txt].filter(Boolean).join(' ');
+    return '<tr data-iface="' + encAttr(c.name) + '" data-router="' + e.routerIdx + '" data-search="' + encAttr(rowSearch) + '" class="cursor-pointer transition-colors ' + rowCls + '" onclick="selectRow(this,event)">' +
+      '<td class="pl-4 pr-1 py-5"><input type="checkbox" class="row-chk size-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer" data-name="' + encAttr(c.name) + '" data-router="' + e.routerIdx + '" onclick="event.stopPropagation();syncRowHighlight(this)"/></td>' +
+      '<td class="px-4 py-5 text-sm font-medium text-slate-400">' + String(c.stt).padStart(2,'0') + '</td>' +
+      '<td class="px-4 py-5 poll-ip"><div class="flex flex-col">' + st.ipHtml + '</div></td>' +
+      '<td class="px-4 py-5"><div class="space-y-1">' +
+        '<div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-bold px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 rounded">HTTP</span><span class="text-sm font-mono text-slate-600 dark:text-slate-300">' + host + ':' + c.http_port + '</span></div>' +
+        '<div class="flex items-center gap-2"><span class="text-[10px] font-bold px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 rounded">SOCKS</span><span class="text-sm font-mono text-slate-600 dark:text-slate-300">' + host + ':' + c.socks_port + '</span></div>' +
+      '</div></td>' +
+      '<td class="px-4 py-5"><div class="flex items-center justify-between px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg w-36">' +
+        '<span id="' + uid + '" class="text-xs font-mono text-slate-500" data-login="' + encAttr(c.proxy_login || '') + '" data-pass="' + encAttr(c.proxy_password || '') + '">••••••••</span>' +
+        '<button class="pwd-toggle text-slate-400 hover:text-primary transition-colors" data-target="' + uid + '">' +
+          '<span class="material-symbols-outlined text-sm">visibility</span>' +
+        '</button>' +
+      '</div></td>' +
+      '<td class="px-4 py-5 poll-status"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full ' + st.cls + ' text-xs font-bold"><span class="size-1.5 rounded-full ' + st.dot + '"></span> ' + st.txt + '</span></td>' +
+      '<td class="px-4 py-5 text-right"><div class="flex items-center justify-end gap-1">' +
+        '<button class="p-1.5 text-primary hover:bg-primary/10 rounded-lg transition-colors" title="Đổi mật khẩu" onclick="event.stopPropagation();openPwdModal(\'' + encAttr(c.envlist || '') + '\',\'' + encAttr(c.container_id || '') + '\',\'' + encAttr(c.name || '') + '\',' + e.routerIdx + ')"><span class="material-symbols-outlined text-[20px]">key</span></button>' +
+        (isOut1
+          ? '<span class="p-1.5 text-slate-300 cursor-not-allowed" title="Cổng điều khiển"><span class="material-symbols-outlined text-[20px]">lock</span></span>'
+          : '<button class="p-1.5 text-amber-500 hover:bg-amber-50 rounded-lg transition-colors" onclick="event.stopPropagation();mrRotateOne(\'' + encAttr(c.name) + '\',' + e.routerIdx + ')" title="Xoay IP"><span class="material-symbols-outlined text-[20px]">sync</span></button>') +
+        (c.container_id ? '<button class="p-1.5 text-emerald-500 hover:bg-emerald-50 rounded-lg transition-colors" onclick="event.stopPropagation();mrRestartContainer(\'' + encAttr(c.container_id) + '\',\'' + encAttr(c.name) + '\',' + e.routerIdx + ')" title="Restart Container"><span class="material-symbols-outlined text-[20px]">restart_alt</span></button>' : '') +
+      '</div></td>' +
+    '</tr>';
+  }).join('');
+  const searchEl = document.getElementById('search-proxy');
+  if (searchEl && searchEl.value.trim()) filterProxyTable(searchEl.value);
+  setTimeout(() => { initVnMap(); updateMapMarkers(); }, 300);
+}
+
+async function mrRotateOne(iface, routerIdx) {
+  const r = _mrList[routerIdx]; if (!r) return;
+  if (iface === 'pppoe-out1') { showToast('warn', 'Không thể xoay', 'pppoe-out1 là cổng điều khiển'); return; }
+  const creds = { host: r.host, username: r.username, password: r.password };
+  _rotating.add(iface);
+  updateRowRotating(iface, routerIdx);
+  showToast('warn', 'Đang xoay IP...', r.host + ' — ' + iface);
+  try {
+    const res = await fetch(API + '/mikrotik/rotate-ip?interface_name=' + encodeURIComponent(iface), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(creds),
+    });
+    const data = await res.json();
+    _rotating.delete(iface);
+    if (res.ok && data.status === 'success') {
+      showToast('success', 'Xoay IP thành công', iface + ': ' + data.old_ip + ' → ' + data.new_ip);
+      showOldIpStrikethrough(iface, data.old_ip, data.new_ip, routerIdx);
+    } else {
+      showToast('error', 'Xoay thất bại', data.detail || data.status || 'Timeout');
+    }
+  } catch (e) {
+    _rotating.delete(iface);
+    showToast('error', 'Lỗi', 'Không thể gọi API xoay IP');
+  }
+}
+
+async function mrRestartContainer(containerId, iface, routerIdx) {
+  const r = _mrList[routerIdx]; if (!r) return;
+  const creds = { host: r.host, username: r.username, password: r.password };
+  showToast('warn', 'Đang restart...', r.host + ' — ' + iface);
+  try {
+    const res = await fetch(API + '/mikrotik/restart-container?container_id=' + encodeURIComponent(containerId), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(creds),
+    });
+    if (res.ok) showToast('success', 'Đã restart', iface);
+    else showToast('error', 'Thất bại', 'Không thể restart ' + iface);
+  } catch(_) { showToast('error', 'Lỗi', 'Không thể restart'); }
+}
+
+function renderMrNodes() {
+  const container = document.getElementById('mr-nodes');
+  if (!container) return;
+  const onlineCount = _mrList.filter(r => r.status === 'online').length;
+  const totalProxy = _mrList.reduce((s, r) => s + (r.proxy_count || 0), 0);
+  const statsEl = document.getElementById('mr-stats');
+  if (statsEl) statsEl.textContent = _mrList.length + ' router • ' + onlineCount + ' online • ' + totalProxy + ' proxy';
+  const hasAllData = Object.keys(_mrAllData).length > 0;
+  if (_mrList.length === 0) {
+    container.innerHTML = '<p class="text-[10px] text-slate-400">Chưa có router. Nhấn "Thêm" hoặc "Nhập".</p>';
+    return;
+  }
+  let html = '';
+  if (hasAllData) {
+    const isAllActive = _mrFilter === 'all';
+    html += '<button onclick="mrSelectRouter(\'all\')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-bold transition-all ' +
+      (isAllActive ? 'border-violet-400 bg-violet-100 text-violet-700 ring-1 ring-violet-300' : 'border-slate-200 bg-white text-slate-600 hover:border-violet-300') +
+      '"><span class="material-symbols-outlined text-xs">apps</span> Tất cả (' + totalProxy + ')</button>';
+  }
+  html += _mrList.map((r, i) => {
+    const isOn = r.status === 'online';
+    const isOff = r.status === 'offline';
+    const isTesting = r.status === 'testing';
+    const isActive = hasAllData && _mrFilter === i;
+    const dotColor = isOn ? 'bg-emerald-500' : isOff ? 'bg-red-500' : isTesting ? 'bg-blue-500 animate-pulse' : 'bg-slate-400';
+    const cls = isActive ? 'border-violet-400 bg-violet-50 text-violet-700 ring-1 ring-violet-300' :
+      isOn ? 'border-emerald-200 bg-emerald-50/50 text-slate-700 hover:border-violet-300' :
+      isOff ? 'border-red-200 bg-white text-slate-500' : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300';
+    const clickFn = hasAllData ? 'mrSelectRouter('+i+')' : 'mrTestOne('+i+')';
+    return '<button onclick="'+clickFn+'" oncontextmenu="showRouterCtxMenu(event,'+i+')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-bold transition-all text-left '+cls+'" title="'+enc_mr(r.host)+'">' +
+      '<span class="size-2 rounded-full shrink-0 '+dotColor+'"></span>' +
+      '<span class="break-words leading-tight">'+ enc_mr(r.note || r.identity || r.host) +'</span>' +
+      '<span class="text-[9px] font-medium opacity-60 shrink-0">'+(r.proxy_count || 0)+'</span>' +
+    '</button>';
+  }).join('');
+  container.innerHTML = html;
+}
+
+let _ctxRouterIdx = -1;
+function showRouterCtxMenu(e, idx) {
+  e.preventDefault();
+  _ctxRouterIdx = idx;
+  const menu = document.getElementById('router-ctx-menu');
+  const r = _mrList[idx];
+  document.getElementById('ctx-router-name').textContent = r ? (r.note || r.host) : '';
+  menu.style.left = e.pageX + 'px';
+  menu.style.top = e.pageY + 'px';
+  menu.classList.remove('hidden');
+  setTimeout(() => document.addEventListener('click', hideRouterCtxMenu, { once: true }), 10);
+}
+function hideRouterCtxMenu() { document.getElementById('router-ctx-menu').classList.add('hidden'); }
+async function ctxReconnect() {
+  hideRouterCtxMenu();
+  if (_ctxRouterIdx < 0) return;
+  delete _mrAllData[_ctxRouterIdx];
+  await mrTestOne(_ctxRouterIdx, 3);
+  await mrReconnectOne(_ctxRouterIdx);
+}
+async function ctxTestRouter() {
+  hideRouterCtxMenu();
+  if (_ctxRouterIdx < 0) return;
+  await mrTestOne(_ctxRouterIdx, 3);
+  renderMrNodes();
+}
+function ctxEditRouter() {
+  hideRouterCtxMenu();
+  openMrEditModal();
+  setTimeout(() => selectEditRouter(_ctxRouterIdx), 100);
+}
+function ctxRemoveRouter() {
+  hideRouterCtxMenu();
+  if (_ctxRouterIdx < 0 || !_mrList[_ctxRouterIdx]) return;
+  const name = _mrList[_ctxRouterIdx].note || _mrList[_ctxRouterIdx].host;
+  if (!confirm('Xóa "' + name + '" khỏi danh sách?')) return;
+  delete _mrAllData[_ctxRouterIdx];
+  _mrList.splice(_ctxRouterIdx, 1);
+  saveMrList(); renderMrNodes();
+  if (Object.keys(_mrAllData).length > 0) renderMultiTable();
+  showToast('success', 'Đã xóa', name);
+}
+
+function mrChangePassAll() {
+  if (_mrList.length === 0) { showToast('warn', 'Chưa có router', ''); return; }
+  document.getElementById('chpass-new').value = '';
+  document.getElementById('chpass-modal').classList.remove('hidden');
+}
+
+async function doChangePassAll() {
+  const newPass = document.getElementById('chpass-new').value.trim();
+  const targetUser = document.getElementById('chpass-user').value.trim() || 'admin';
+  if (!newPass) { showToast('warn', 'Thiếu password', 'Nhập password mới'); return; }
+  document.getElementById('chpass-modal').classList.add('hidden');
+  showToast('warn', 'Đang đổi password...', _mrList.length + ' router');
+  let ok = 0, fail = 0;
+  for (const r of _mrList) {
+    try {
+      const res = await fetch(API + '/mikrotik/change-admin-password?username=' + encodeURIComponent(targetUser) + '&new_password=' + encodeURIComponent(newPass), {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ host: r.host, username: r.username, password: r.password }),
+      });
+      if (res.ok) { r.password = newPass; ok++; }
+      else fail++;
+    } catch(_) { fail++; }
+  }
+  saveMrList(); renderMrNodes();
+  showToast(fail === 0 ? 'success' : 'warn', 'Đổi password', ok + ' thành công' + (fail ? ', ' + fail + ' thất bại' : ''));
+}
+
+function mrExportList() {
+  const lines = _mrList.map(r => r.host + ':' + r.username + ':' + r.password + (r.note ? ':' + r.note : '')).join('\n');
+  const blob = new Blob([lines], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'routers_' + new Date().toISOString().slice(0,10) + '.txt';
+  a.click();
+  showToast('success', 'Đã xuất', _mrList.length + ' router');
+}
+
+let _schedTimers = {};
+let _schedCountdownTimers = {};
+let _schedNextRuns = {};
+let _schedMode = 'interval';
+let _schedTarget = 'all';
+
+function getSchedStore() { return JSON.parse(localStorage.getItem('ht_schedules') || '{}'); }
+function setSchedStore(s) { localStorage.setItem('ht_schedules', JSON.stringify(s)); }
+function getIfaceSched(iface) { return getSchedStore()[iface] || null; }
+
+function openScheduleModal() {
+  if (!_connected) { showToast('warn', 'Chưa kết nối', 'Kết nối router trước'); return; }
+  _schedTarget = 'all';
+  document.getElementById('sched-modal-desc').textContent = 'Tự động xoay tất cả proxy theo chu kỳ';
+  const saved = getSchedStore()['all'];
+  if (saved) {
+    _schedMode = saved.mode || 'interval';
+    document.getElementById('sched-val').value = saved.val || 30;
+    document.getElementById('sched-unit').value = saved.unit || 'm';
+    if (saved.time) document.getElementById('sched-time').value = saved.time;
+  } else { _schedMode = 'interval'; }
+  setSchedMode(_schedMode);
+  updateSchedUI();
+  renderSchedIfaceList();
+  document.getElementById('sched-iface-list').classList.remove('hidden');
+  document.getElementById('schedule-modal').classList.remove('hidden');
+}
+
+function openIfaceSchedModal(iface) {
+  if (!_connected) { showToast('warn', 'Chưa kết nối', 'Kết nối router trước'); return; }
+  _schedTarget = iface;
+  document.getElementById('sched-modal-desc').textContent = 'Hẹn giờ xoay cho: ' + iface;
+  const saved = getSchedStore()[iface];
+  if (saved) {
+    _schedMode = saved.mode || 'interval';
+    document.getElementById('sched-val').value = saved.val || 30;
+    document.getElementById('sched-unit').value = saved.unit || 'm';
+    if (saved.time) document.getElementById('sched-time').value = saved.time;
+  } else { _schedMode = 'interval'; document.getElementById('sched-val').value = 30; document.getElementById('sched-unit').value = 'm'; }
+  setSchedMode(_schedMode);
+  updateSchedUI();
+  document.getElementById('sched-iface-list').classList.add('hidden');
+  document.getElementById('schedule-modal').classList.remove('hidden');
+}
+
+function setSchedMode(mode) {
+  _schedMode = mode;
+  document.querySelectorAll('.sched-mode-btn').forEach(b => {
+    b.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-600');
+    b.classList.add('border-slate-200', 'text-slate-500');
+  });
+  const active = document.getElementById('sched-mode-' + mode);
+  if (active) { active.classList.add('border-blue-500', 'bg-blue-50', 'text-blue-600'); active.classList.remove('border-slate-200', 'text-slate-500'); }
+  document.getElementById('sched-interval-box').classList.toggle('hidden', mode !== 'interval');
+  document.getElementById('sched-daily-box').classList.toggle('hidden', mode !== 'daily');
+}
+
+async function startCurrentSchedule() { await startSchedFor(_schedTarget); document.getElementById('schedule-modal').classList.add('hidden'); }
+async function stopCurrentSchedule() { await stopSchedFor(_schedTarget); document.getElementById('schedule-modal').classList.add('hidden'); }
+
+function buildMkInterval() {
+  if (_schedMode === 'interval') {
+    const val = parseInt(document.getElementById('sched-val').value) || 30;
+    const unit = document.getElementById('sched-unit').value;
+    const totalMin = unit === 'h' ? val * 60 : val;
+    const h = Math.floor(totalMin / 60); const m = totalMin % 60;
+    return { interval: String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':00', val, unit, mode: 'interval' };
+  } else {
+    const time = document.getElementById('sched-time').value || '06:00';
+    return { interval: '1d 00:00:00', start_time: time + ':00', val: 0, unit: '', mode: 'daily', time };
+  }
+}
+
+async function startSchedFor(target) {
+  if (!_mkCreds) { showToast('warn', 'Chưa kết nối', ''); return; }
+  const cfg = buildMkInterval();
+  const ifaces = target === 'all'
+    ? (_lastClients || []).filter(c => c.name !== 'pppoe-out1').map(c => c.name)
+    : [target];
+  const body = {
+    host: _mkCreds.host, username: _mkCreds.username, password: _mkCreds.password,
+    interfaces: ifaces,
+    interval: cfg.interval,
+    name: target === 'all' ? 'ht_rotate_all' : '',
+  };
+  if (cfg.start_time) body.start_time = cfg.start_time;
+  try {
+    const res = await fetch(API + '/mikrotik/schedule/create', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (res.ok && data.status === 'success') {
+      const store = getSchedStore();
+      const info = { ...cfg, script: data.script_name, scheduler: data.scheduler_name, ifaces };
+      store[target] = info;
+      if (target === 'all' || ifaces.length > 1) {
+        ifaces.forEach(iface => { store[iface] = { ...info, via: target }; });
+      }
+      setSchedStore(store);
+      const label = target === 'all' ? 'tất cả' : target;
+      showToast('success', 'Đã tạo hẹn giờ trên MikroTik', label + ': ' + (cfg.mode === 'interval' ? 'mỗi ' + cfg.val + (cfg.unit === 'h' ? 'h' : 'm') : 'mỗi ngày ' + cfg.time));
+    } else {
+      showToast('error', 'Lỗi tạo hẹn giờ', data.detail || data.error || 'Lỗi');
+    }
+  } catch (e) { showToast('error', 'Lỗi', 'Không thể gọi API hẹn giờ'); }
+  updateSchedUI(); refreshAllSchedInfo();
+  await loadMkSchedules();
+}
+
+async function stopSchedFor(target) {
+  if (!_mkCreds) return;
+  const store = getSchedStore();
+  const saved = store[target];
+  const name = saved?.script || (target === 'all' ? 'ht_rotate_all' : 'ht_rotate_' + target);
+  const ifaces = saved?.ifaces || (target === 'all' ? [] : [target]);
+  try {
+    await fetch(API + '/mikrotik/schedule/delete', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ host: _mkCreds.host, username: _mkCreds.username, password: _mkCreds.password, interfaces: ifaces, name }),
+    });
+  } catch (_) {}
+  if (saved?.ifaces) saved.ifaces.forEach(i => delete store[i]);
+  delete store[target]; setSchedStore(store);
+  showToast('success', 'Đã xóa hẹn giờ', target === 'all' ? 'Tất cả' : target);
+  updateSchedUI(); refreshAllSchedInfo();
+  await loadMkSchedules();
+}
+
+function stopSchedule() {
+  const store = getSchedStore();
+  Object.keys(store).forEach(async k => { await stopSchedFor(k); });
+  localStorage.removeItem('ht_schedules'); localStorage.removeItem('ht_schedule');
+  _schedTimers = {}; _schedCountdownTimers = {}; _schedNextRuns = {};
+  updateSchedUI(); refreshAllSchedInfo();
+}
+
+async function loadMkSchedules() {
+  const credsList = [];
+  if (_mrActive && _mrAllData) {
+    Object.values(_mrAllData).forEach(d => {
+      if (d && d.router) credsList.push({ host: d.router.host, username: d.router.username, password: d.router.password });
+    });
+  } else if (_mkCreds) {
+    credsList.push(_mkCreds);
+  }
+  if (!credsList.length) return;
+
+  const store = {};
+  let anySuccess = false;
+  for (const creds of credsList) {
+    try {
+      const res = await fetch(API + '/mikrotik/schedule/list', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(creds),
+      });
+      if (!res.ok) continue;
+      anySuccess = true;
+      const data = await res.json();
+      (data.schedules || []).forEach(s => {
+        const ifaces = (s.source || '').match(/name="(pppoe-out\d+)"/g) || [];
+        const ifaceNames = ifaces.map(i => i.match(/name="(.+?)"/)[1]);
+        const isAll = s.script_name === 'ht_rotate_all';
+        const info = {
+          mode: 'interval', interval: s.interval, script: s.script_name, scheduler: s.scheduler_name,
+          ifaces: ifaceNames, run_count: s.run_count, next_run: s.next_run, host: creds.host,
+        };
+        if (isAll) {
+          store['all'] = info;
+          ifaceNames.forEach(iface => { store[iface] = { ...info, via: 'all' }; });
+        } else if (ifaceNames.length === 1) {
+          store[ifaceNames[0]] = info;
+        } else {
+          store[s.script_name] = info;
+          ifaceNames.forEach(iface => { store[iface] = { ...info, via: s.script_name }; });
+        }
+      });
+    } catch (e) { console.error('loadMkSchedules error:', e); }
+  }
+  if (anySuccess) localStorage.setItem('ht_schedules', JSON.stringify(store));
+  updateSchedUI(); refreshAllSchedInfo();
+  if (document.getElementById('schedule-modal') && !document.getElementById('schedule-modal').classList.contains('hidden')) {
+    renderSchedIfaceList();
+  }
+}
+
+function getNextDailyMs(timeStr) {
+  const [h, m] = timeStr.split(':').map(Number);
+  const now = new Date();
+  const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
+  if (target <= now) target.setDate(target.getDate() + 1);
+  return target - now;
+}
+
+function fmtInterval(interval) {
+  if (!interval) return '';
+  return interval.replace(/^0+/, '').replace(/^:/, '') || interval;
+}
+
+function updateSchedUI() {
+  const store = getSchedStore();
+  const isRunning = !!store[_schedTarget];
+  document.getElementById('sched-status').classList.toggle('hidden', !isRunning);
+  document.getElementById('btn-sched-start').classList.toggle('hidden', isRunning);
+  document.getElementById('btn-sched-stop').classList.toggle('hidden', !isRunning);
+  const count = Object.keys(store).length;
+  const mainBtn = document.getElementById('btn-schedule');
+  const mainText = document.getElementById('btn-schedule-text');
+  if (count > 0) {
+    mainBtn.classList.remove('border-slate-200', 'text-slate-700');
+    mainBtn.classList.add('border-blue-400', 'bg-blue-50', 'text-blue-600', 'ring-1', 'ring-blue-300');
+    mainText.textContent = 'Hẹn giờ (' + count + ')';
+  } else {
+    mainBtn.classList.remove('border-blue-400', 'bg-blue-50', 'text-blue-600', 'ring-1', 'ring-blue-300');
+    mainBtn.classList.add('border-slate-200', 'text-slate-700');
+    mainText.textContent = 'Hẹn giờ xoay';
+  }
+}
+
+function renderSchedIfaceList() {
+  const container = document.getElementById('sched-iface-tbody');
+  if (!_lastClients || !_lastClients.length) { container.innerHTML = ''; return; }
+  const store = getSchedStore();
+  container.innerHTML = _lastClients.filter(c => c.name !== 'pppoe-out1').map(c => {
+    const s = store[c.name]; const active = !!s;
+    let info = '';
+    if (active) {
+      info = s.interval ? fmtMkInterval(s.interval) : '';
+      if (s.via) info += ' (Tất cả)';
+      if (s.run_count && s.run_count !== '0') info += ' ×' + s.run_count;
+    }
+    const canStop = active && !s.via;
+    return '<div class="flex items-center gap-2 py-1.5 px-2 rounded-lg ' + (active ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-slate-50 dark:bg-slate-800') + '">' +
+      '<span class="material-symbols-outlined text-sm ' + (active ? 'text-blue-500 animate-pulse' : 'text-slate-400') + '">' + (active ? 'timer' : 'timer_off') + '</span>' +
+      '<span class="text-xs font-bold flex-1">' + c.name + '</span>' +
+      (active ? '<span class="text-[10px] text-blue-600 font-medium">' + info + '</span>' : '<span class="text-[10px] text-slate-400">Chưa hẹn</span>') +
+      (canStop ? '<button onclick="event.stopPropagation();stopSchedFor(\'' + encAttr(c.name) + '\').then(()=>renderSchedIfaceList())" class="text-red-400 hover:text-red-600 p-0.5"><span class="material-symbols-outlined text-sm">close</span></button>' : '') +
+    '</div>';
+  }).join('');
+}
+
+function fmtMkInterval(interval) {
+  if (!interval) return '';
+  const parts = interval.split(':').map(Number);
+  if (parts.length === 3) {
+    const [h, m] = parts;
+    if (h > 0 && m > 0) return h + 'h ' + m + 'm';
+    if (h > 0) return h + ' giờ';
+    if (m > 0) return m + ' phút';
+  }
+  return interval;
+}
+
+function refreshAllSchedInfo() {
+  if (!_lastClients) return;
+  _lastClients.forEach(c => { if (c.name !== 'pppoe-out1') refreshSchedInfoRow(c.name); });
+}
+
+function refreshSchedInfoRow(iface) {
+  const el = document.querySelector('.sched-info-' + CSS.escape(iface));
+  if (!el) return;
+  const s = getSchedStore()[iface];
+  if (!s) { el.innerHTML = ''; updateSchedBtn(iface, false); return; }
+  const info = s.interval ? fmtMkInterval(s.interval) : '';
+  const extra = (s.run_count && s.run_count !== '0') ? ' ×' + s.run_count : '';
+  el.innerHTML = '<span class="inline-flex items-center gap-1 text-[10px] font-medium text-blue-500 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded-full"><span class="material-symbols-outlined text-xs animate-pulse">timer</span> ' + info + extra + '</span>';
+  updateSchedBtn(iface, true);
+}
+
+function updateSchedBtn(iface, active) {
+  const btn = document.querySelector('.sched-btn-' + CSS.escape(iface));
+  if (!btn) return;
+  btn.classList.remove('text-slate-400', 'hover:bg-slate-50', 'text-blue-500', 'hover:bg-blue-50');
+  btn.classList.add(active ? 'text-blue-500' : 'text-slate-400', active ? 'hover:bg-blue-50' : 'hover:bg-slate-50');
+}
+
+async function restoreSchedule() {
+  localStorage.removeItem('ht_schedule');
+  updateSchedUI(); refreshAllSchedInfo();
+  await loadMkSchedules();
+  setTimeout(loadMkSchedules, 5000);
+}
+
+// ─── Vietnam Map ───
+let _vnMap = null, _vnMarkers = [], _vnGeoCache = {};
+
+function initVnMap() {
+  if (_vnMap) return;
+  const el = document.getElementById('vn-map');
+  if (!el) return;
+  _vnMap = L.map(el, { zoomControl: false, attributionControl: false }).setView([16.0, 106.0], 6);
+  L.control.zoom({ position: 'topright' }).addTo(_vnMap);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 18,
+  }).addTo(_vnMap);
+  try { _vnGeoCache = JSON.parse(localStorage.getItem('ht_geo_cache') || '{}'); } catch (_) { _vnGeoCache = {}; }
+}
+
+function clearMapMarkers() {
+  _vnMarkers.forEach(m => _vnMap.removeLayer(m));
+  _vnMarkers = [];
+}
+
+async function geolocateIp(ip) {
+  if (!ip || ip === '—' || ip.startsWith('10.') || ip.startsWith('192.168.') || ip.startsWith('172.')) return null;
+  const cached = _vnGeoCache[ip];
+  if (cached && Date.now() - (cached._ts || 0) < 3600000) return cached;
+  try {
+    const res = await fetch('http://ip-api.com/json/' + ip + '?fields=status,city,regionName,lat,lon,isp&lang=vi');
+    const d = await res.json();
+    if (d.status !== 'success') return null;
+    const geo = { city: d.city, region: d.regionName, lat: d.lat, lon: d.lon, isp: d.isp, _ts: Date.now() };
+    _vnGeoCache[ip] = geo;
+    try { localStorage.setItem('ht_geo_cache', JSON.stringify(_vnGeoCache)); } catch (_) {}
+    return geo;
+  } catch (_) { return null; }
+}
+
+async function updateMapMarkers() {
+  if (!_vnMap) initVnMap();
+  if (!_vnMap) return;
+  clearMapMarkers();
+  const clients = _lastClients || [];
+  const onlineClients = clients.filter(c => c.ip && c.name !== 'pppoe-out1' && c.status !== 'disabled');
+  document.getElementById('map-count').textContent = onlineClients.length + ' IP';
+
+  const batchSize = 5;
+  const bounds = [];
+  for (let i = 0; i < onlineClients.length; i += batchSize) {
+    const batch = onlineClients.slice(i, i + batchSize);
+    const results = await Promise.all(batch.map(async c => {
+      const geo = await geolocateIp(c.ip);
+      return geo ? { client: c, geo } : null;
+    }));
+    results.filter(Boolean).forEach(r => {
+      const { client: c, geo } = r;
+      const marker = L.circleMarker([geo.lat, geo.lon], {
+        radius: 7, fillColor: '#3b82f6', color: '#1d4ed8', weight: 2, fillOpacity: 0.85,
+      }).addTo(_vnMap);
+      marker.bindPopup(
+        '<div style="font-family:Inter,sans-serif;min-width:160px">' +
+        '<div style="font-weight:700;font-size:13px;margin-bottom:4px;color:#1e293b">' + c.name + '</div>' +
+        '<div style="font-size:12px;color:#3b82f6;font-weight:600;margin-bottom:4px">' + c.ip + '</div>' +
+        '<div style="font-size:11px;color:#64748b">' + geo.city + ', ' + geo.region + '</div>' +
+        (geo.isp ? '<div style="font-size:10px;color:#94a3b8;margin-top:2px">' + geo.isp + '</div>' : '') +
+        (c._host ? '<div style="font-size:10px;color:#94a3b8;margin-top:2px">Router: ' + c._host + '</div>' : '') +
+        '</div>',
+        { closeButton: false, className: 'map-popup' }
+      );
+      _vnMarkers.push(marker);
+      bounds.push([geo.lat, geo.lon]);
+    });
+    if (i + batchSize < onlineClients.length) await new Promise(r => setTimeout(r, 1200));
+  }
+  if (bounds.length > 1) _vnMap.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 });
+  else if (bounds.length === 1) _vnMap.setView(bounds[0], 10);
+}
+
+function refreshMapMarkers() { updateMapMarkers(); }
+
+</script>
+</body></html>

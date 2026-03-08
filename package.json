@@ -1,0 +1,53 @@
+{
+  "name": "ht-proxy-desktop",
+  "version": "2.6.0",
+  "description": "HT Proxy - Quản lý Proxy chuyên nghiệp",
+  "main": "app/main.js",
+  "scripts": {
+    "prestart": "node scripts/build-icon.js",
+    "start": "electron .",
+    "build": "node scripts/build-icon.js && electron-builder"
+  },
+  "author": "HT Proxy",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "sharp": "^0.34.5"
+  },
+  "build": {
+    "appId": "com.htproxy.desktop",
+    "productName": "HT Proxy",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "app/**/*",
+      "package.json",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+      "!.editorconfig",
+      "!**/node_modules/*.d.ts",
+      "!**/node_modules/.bin",
+      "!**/*.{ts,tsx}"
+    ],
+    "extraResources": [
+      {
+        "from": "backend/dist/backend.exe",
+        "to": "backend/backend.exe"
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "app/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "HT Proxy"
+    }
+  }
+}

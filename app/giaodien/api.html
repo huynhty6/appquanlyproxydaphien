@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>API Server - HT Proxy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: { extend: {
+    colors: { "primary": "#1349ec", "background-light": "#f6f6f8", "background-dark": "#101522" },
+    fontFamily: { "display": ["Inter"] },
+  }},
+}
+</script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<script>if(location.search.includes('embed=1')){document.write('<style>aside{display:none!important}.max-w-5xl,.max-w-6xl,.max-w-7xl{max-width:100%!important}</style>');}</script>
+
+<div class="flex h-screen overflow-hidden flex-col">
+<header class="h-16 flex-shrink-0 bg-white dark:bg-background-dark border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
+<h2 class="text-lg font-bold flex items-center gap-2"><span class="material-symbols-outlined text-primary">api</span> API Xoay IP</h2>
+<div class="flex items-center gap-3">
+<button class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-symbols-outlined text-xl block dark:hidden">dark_mode</span>
+<span class="material-symbols-outlined text-xl hidden dark:block">light_mode</span>
+</button>
+<div class="h-8 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<div class="flex items-center gap-2.5 cursor-pointer group" onclick="window.parent?.postMessage('ht_go_profile','*')">
+<div class="text-right hidden sm:block"><p id="header-user-name" class="text-sm font-bold truncate max-w-[120px]">...</p><p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Người dùng</p></div>
+<div class="size-9 rounded-full bg-primary/20 overflow-hidden border-2 border-transparent group-hover:border-primary transition-all"><img src="../logouser.png" alt="Avatar" class="w-full h-full object-cover"></div>
+</div>
+<button onclick="window.parent?.document.getElementById('btn-logout')?.click()" class="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors" title="Đăng xuất"><span class="material-symbols-outlined text-xl">logout</span></button>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto">
+<div class="p-6 space-y-6 max-w-7xl mx-auto">
+
+<!-- Header -->
+<div class="flex items-center justify-between flex-wrap gap-3">
+<div>
+<h2 class="text-2xl font-black flex items-center gap-3"><span class="material-symbols-outlined text-primary text-3xl">api</span> API Xoay IP</h2>
+<p class="text-slate-500 mt-1 text-sm">Tạo link xoay IP public — dán lên trình duyệt hoặc gọi từ bot</p>
+</div>
+<div class="flex items-center gap-2">
+<input id="api-host" type="text" value="http://api.proxydaphien.ltd" class="px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm w-64 font-mono" placeholder="http://domain:3000"/>
+<button onclick="testConnection()" id="btn-test" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary/90 flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">wifi_tethering</span> Kết nối
+</button>
+<span id="conn-status" class="text-xs text-slate-400 hidden"><span class="material-symbols-outlined text-emerald-500 text-sm align-middle">check_circle</span> Đã kết nối</span>
+</div>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Máy chạy Backend API phải truy cập được MikroTik (cùng mạng/VPN). Bạn vào được Winbox từ máy nào thì nhập URL API của máy đó (vd: <code class="bg-slate-100 dark:bg-slate-800 px-1 rounded">http://127.0.0.1:8000</code>).</p>
+
+<!-- Stats -->
+<div class="grid grid-cols-3 gap-4">
+<div class="bg-white dark:bg-slate-900/50 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
+<p class="text-xs text-slate-400 font-bold uppercase">Routers (từ Dashboard)</p>
+<p class="text-2xl font-black mt-1" id="st-routers">0</p>
+</div>
+<div class="bg-white dark:bg-slate-900/50 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
+<p class="text-xs text-slate-400 font-bold uppercase">Tokens</p>
+<p class="text-2xl font-black mt-1" id="st-tokens">0</p>
+</div>
+<div class="bg-white dark:bg-slate-900/50 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
+<p class="text-xs text-slate-400 font-bold uppercase">Requests</p>
+<p class="text-2xl font-black mt-1" id="st-requests">0</p>
+</div>
+</div>
+
+<!-- Tabs -->
+<div class="bg-slate-100 dark:bg-slate-800/50 rounded-xl p-1 flex gap-1">
+<button class="tab-btn flex-1 py-2 rounded-lg text-sm font-bold bg-white dark:bg-slate-900 text-primary shadow-sm" data-tab="routers" onclick="switchTab('routers')">Routers</button>
+<button class="tab-btn flex-1 py-2 rounded-lg text-sm font-bold text-slate-500" data-tab="tokens" onclick="switchTab('tokens')">Tokens</button>
+<button class="tab-btn flex-1 py-2 rounded-lg text-sm font-bold text-slate-500" data-tab="logs" onclick="switchTab('logs')">Logs</button>
+<button class="tab-btn flex-1 py-2 rounded-lg text-sm font-bold text-slate-500" data-tab="docs" onclick="switchTab('docs')">Hướng dẫn</button>
+</div>
+
+<!-- Tab: Routers (read-only from dashboard) -->
+<div id="tab-routers" class="tab-content">
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+<div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+<h4 class="font-bold">Routers</h4>
+</div>
+<div class="overflow-x-auto"><table class="w-full text-left"><thead><tr class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
+<th class="px-6 py-3">#</th><th class="px-6 py-3">Tên</th><th class="px-6 py-3">Host</th><th class="px-6 py-3">Username</th><th class="px-6 py-3">Link mẫu</th>
+</tr></thead><tbody id="router-tbody" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody></table></div>
+</div>
+</div>
+
+<!-- Tab: Tokens -->
+<div id="tab-tokens" class="tab-content hidden">
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+<div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+<h4 class="font-bold">Danh sách Token</h4>
+<button onclick="createToken()" class="px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-bold hover:bg-primary/90 flex items-center gap-1"><span class="material-symbols-outlined text-sm">add</span> Tạo Token</button>
+</div>
+<div class="overflow-x-auto"><table class="w-full text-left"><thead><tr class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
+<th class="px-6 py-3">Tên</th><th class="px-6 py-3">Token</th><th class="px-6 py-3">Routers</th><th class="px-6 py-3">Trạng thái</th><th class="px-6 py-3 text-right">Thao tác</th>
+</tr></thead><tbody id="token-tbody" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody></table></div>
+</div>
+
+<!-- Link mẫu cho token đang chọn -->
+<div id="sample-links-box" class="mt-4 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-6 hidden">
+<h4 class="font-bold text-sm mb-3">Link xoay IP mẫu</h4>
+<div id="sample-links" class="space-y-2 font-mono text-xs"></div>
+</div>
+</div>
+
+<!-- Tab: Logs -->
+<div id="tab-logs" class="tab-content hidden">
+<div class="grid grid-cols-4 gap-3 mb-4">
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex items-center gap-3">
+<div class="size-10 bg-blue-100 dark:bg-blue-900/30 text-blue-500 rounded-xl flex items-center justify-center"><span class="material-symbols-outlined">bar_chart</span></div>
+<div><p class="text-[10px] font-bold text-slate-400 uppercase">Tổng request</p><p class="text-xl font-black" id="log-total">0</p></div>
+</div>
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex items-center gap-3">
+<div class="size-10 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-500 rounded-xl flex items-center justify-center"><span class="material-symbols-outlined">check_circle</span></div>
+<div><p class="text-[10px] font-bold text-slate-400 uppercase">Thành công</p><p class="text-xl font-black text-emerald-600" id="log-success">0</p></div>
+</div>
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex items-center gap-3">
+<div class="size-10 bg-red-100 dark:bg-red-900/30 text-red-500 rounded-xl flex items-center justify-center"><span class="material-symbols-outlined">cancel</span></div>
+<div><p class="text-[10px] font-bold text-slate-400 uppercase">Thất bại</p><p class="text-xl font-black text-red-500" id="log-failed">0</p></div>
+</div>
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex items-center gap-3">
+<div class="size-10 bg-violet-100 dark:bg-violet-900/30 text-violet-500 rounded-xl flex items-center justify-center"><span class="material-symbols-outlined">percent</span></div>
+<div><p class="text-[10px] font-bold text-slate-400 uppercase">Tỷ lệ OK</p><p class="text-xl font-black text-violet-600" id="log-rate">—</p></div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+<div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+<h4 class="font-bold">Lịch sử Request</h4>
+<button onclick="loadLogs()" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-bold hover:bg-slate-200 flex items-center gap-1"><span class="material-symbols-outlined text-sm">refresh</span> Làm mới</button>
+</div>
+<div class="overflow-x-auto max-h-[500px] overflow-y-auto"><table class="w-full text-left"><thead class="sticky top-0 bg-white dark:bg-slate-900"><tr class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
+<th class="px-4 py-3">Thời gian</th><th class="px-4 py-3">Nguồn</th><th class="px-4 py-3">Router</th><th class="px-4 py-3">Interface</th><th class="px-4 py-3">Action</th><th class="px-4 py-3">IP cũ</th><th class="px-4 py-3">IP mới</th><th class="px-4 py-3">Kết quả</th><th class="px-4 py-3">Thời gian xử lý</th>
+</tr></thead><tbody id="log-tbody" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody></table></div>
+</div>
+</div>
+
+<!-- Tab: Docs -->
+<div id="tab-docs" class="tab-content hidden">
+<div class="space-y-5">
+
+<!-- Giới thiệu -->
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+<h4 class="font-bold text-lg flex items-center gap-2 mb-2"><span class="material-symbols-outlined text-primary">menu_book</span> Tài liệu API — HT Proxy</h4>
+<p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">API xoay IP hoạt động qua giao thức <strong>HTTP GET</strong>. Bạn chỉ cần dán link vào trình duyệt, gọi từ cURL, bot Telegram, script Python/JS hoặc bất kỳ phần mềm nào hỗ trợ HTTP request là có thể xoay IP proxy từ xa.</p>
+<div class="mt-4 flex flex-wrap gap-2">
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 text-xs font-bold"><span class="material-symbols-outlined text-sm">http</span> HTTP GET</span>
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 text-xs font-bold"><span class="material-symbols-outlined text-sm">data_object</span> JSON Response</span>
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-50 dark:bg-violet-900/20 text-violet-600 text-xs font-bold"><span class="material-symbols-outlined text-sm">key</span> Token Auth</span>
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-600 text-xs font-bold"><span class="material-symbols-outlined text-sm">refresh</span> Auto Retry x5</span>
+</div>
+</div>
+
+<!-- Cấu trúc URL -->
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+<h4 class="font-bold flex items-center gap-2 mb-4"><span class="material-symbols-outlined text-blue-500 text-lg">link</span> Cấu trúc URL chung</h4>
+<div class="bg-slate-900 dark:bg-slate-800 rounded-xl p-5 font-mono text-sm overflow-x-auto">
+<span class="text-slate-500">GET</span> <span class="text-blue-400" id="doc-base-url"></span><span class="text-white">/api/</span><span class="text-violet-400">{action}</span><span class="text-white">/</span><span class="text-emerald-400">{router_host}</span><span class="text-white">/</span><span class="text-amber-400">{token}</span>
+</div>
+<table class="w-full mt-4 text-sm">
+<thead><tr class="text-left text-xs font-bold text-slate-400 uppercase border-b border-slate-200 dark:border-slate-700">
+<th class="pb-2 w-36">Tham số</th><th class="pb-2 w-24">Bắt buộc</th><th class="pb-2">Mô tả</th>
+</tr></thead>
+<tbody class="text-slate-600 dark:text-slate-400">
+<tr class="border-b border-slate-100 dark:border-slate-800"><td class="py-2.5"><code class="text-violet-600 bg-violet-50 dark:bg-violet-900/20 px-2 py-0.5 rounded text-xs font-bold">{action}</code></td><td class="py-2.5 text-xs font-bold text-emerald-500">Có</td><td class="py-2.5 text-xs">Hành động cần thực hiện. Xem bảng endpoint bên dưới.</td></tr>
+<tr class="border-b border-slate-100 dark:border-slate-800"><td class="py-2.5"><code class="text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded text-xs font-bold">{router_host}</code></td><td class="py-2.5 text-xs font-bold text-emerald-500">Có</td><td class="py-2.5 text-xs">Địa chỉ IP hoặc hostname của router MikroTik (lấy từ tab Routers). VD: <code class="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">huynhty.proxydaphien.ltd</code></td></tr>
+<tr><td class="py-2.5"><code class="text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded text-xs font-bold">{token}</code></td><td class="py-2.5 text-xs font-bold text-emerald-500">Có</td><td class="py-2.5 text-xs">Mã xác thực. Tạo trong tab <strong>Tokens</strong>. Mỗi token dùng cho nhiều router.</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- Endpoints chi tiết -->
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+<h4 class="font-bold flex items-center gap-2 mb-5"><span class="material-symbols-outlined text-violet-500 text-lg">call_split</span> Chi tiết từng Endpoint</h4>
+<div class="space-y-6">
+
+<!-- EP1: Xoay 1 proxy -->
+<div class="rounded-xl border border-blue-200 dark:border-blue-800 overflow-hidden">
+<div class="bg-blue-50 dark:bg-blue-900/20 px-5 py-3.5 flex items-center gap-3 border-b border-blue-200 dark:border-blue-800">
+<span class="px-2.5 py-1 bg-blue-500 text-white rounded-md text-[10px] font-black tracking-wider">GET</span>
+<p class="text-sm font-bold text-blue-700 dark:text-blue-300">Xoay IP một proxy cụ thể</p>
+</div>
+<div class="p-5 space-y-4">
+<code class="text-xs bg-slate-900 dark:bg-slate-800 text-blue-300 px-4 py-3 rounded-lg block font-mono break-all" id="doc-rotate-one"></code>
+<div class="text-xs text-slate-600 dark:text-slate-400 space-y-2">
+<p><code class="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-bold">pppoe-out{N}</code> — tên interface PPPoE cần xoay. Thay <code class="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">{N}</code> bằng số thứ tự interface (VD: pppoe-out2, pppoe-out3, ..., pppoe-out32).</p>
+<p>Hệ thống sẽ disconnect → reconnect interface, chờ IP mới. Nếu IP mới trùng IP cũ, tự động thử lại tối đa <strong>5 lần</strong>.</p>
+</div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-3 mb-2">Response thành công</p>
+<pre class="text-xs bg-slate-50 dark:bg-slate-800/50 px-4 py-3 rounded-lg font-mono border border-slate-200 dark:border-slate-700 whitespace-pre-wrap leading-relaxed">{
+  "success": true,
+  "host": "huynhty.proxydaphien.ltd",
+  "interface": "pppoe-out2",
+  "old_ip": "42.116.182.132",
+  "new_ip": "42.113.213.34",
+  "retries": 1,
+  "elapsed_ms": 3842,
+  "message": "Đã xoay IP thành công cho pppoe-out2 (sau 1 lần thử)"
+}</pre>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-3 mb-2">Response thất bại</p>
+<pre class="text-xs bg-red-50 dark:bg-red-900/10 px-4 py-3 rounded-lg font-mono border border-red-200 dark:border-red-800 whitespace-pre-wrap leading-relaxed">{
+  "success": false,
+  "host": "huynhty.proxydaphien.ltd",
+  "interface": "pppoe-out2",
+  "old_ip": "42.116.182.132",
+  "new_ip": "42.116.182.132",
+  "retries": 5,
+  "elapsed_ms": 25410,
+  "message": "Không thể xoay IP mới sau 5 lần thử (IP vẫn trùng)"
+}</pre>
+</div>
+</div>
+
+<!-- EP2: Xoay tất cả -->
+<div class="rounded-xl border border-violet-200 dark:border-violet-800 overflow-hidden">
+<div class="bg-violet-50 dark:bg-violet-900/20 px-5 py-3.5 flex items-center gap-3 border-b border-violet-200 dark:border-violet-800">
+<span class="px-2.5 py-1 bg-violet-500 text-white rounded-md text-[10px] font-black tracking-wider">GET</span>
+<p class="text-sm font-bold text-violet-700 dark:text-violet-300">Xoay tất cả proxy của 1 router</p>
+</div>
+<div class="p-5 space-y-4">
+<code class="text-xs bg-slate-900 dark:bg-slate-800 text-violet-300 px-4 py-3 rounded-lg block font-mono break-all" id="doc-rotate-all"></code>
+<div class="text-xs text-slate-600 dark:text-slate-400 space-y-2">
+<p>Xoay <strong>đồng thời tất cả</strong> interface PPPoE trên router (trừ <code class="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">pppoe-out1</code> — cổng quản trị).</p>
+<p>Kết quả trả về dạng mảng, mỗi phần tử là kết quả xoay IP của 1 interface.</p>
+</div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-3 mb-2">Response</p>
+<pre class="text-xs bg-slate-50 dark:bg-slate-800/50 px-4 py-3 rounded-lg font-mono border border-slate-200 dark:border-slate-700 whitespace-pre-wrap leading-relaxed">{
+  "success": true,
+  "host": "huynhty.proxydaphien.ltd",
+  "total": 3,
+  "elapsed_ms": 12540,
+  "results": [
+    {
+      "interface": "pppoe-out2",
+      "old_ip": "42.116.182.132",
+      "new_ip": "42.113.213.34",
+      "success": true,
+      "retries": 1
+    },
+    {
+      "interface": "pppoe-out3",
+      "old_ip": "113.190.45.67",
+      "new_ip": "27.72.100.15",
+      "success": true,
+      "retries": 1
+    },
+    {
+      "interface": "pppoe-out4",
+      "old_ip": "14.225.3.89",
+      "new_ip": "14.225.3.89",
+      "success": false,
+      "retries": 5
+    }
+  ]
+}</pre>
+</div>
+</div>
+
+<!-- EP3: Xem trạng thái -->
+<div class="rounded-xl border border-emerald-200 dark:border-emerald-800 overflow-hidden">
+<div class="bg-emerald-50 dark:bg-emerald-900/20 px-5 py-3.5 flex items-center gap-3 border-b border-emerald-200 dark:border-emerald-800">
+<span class="px-2.5 py-1 bg-emerald-500 text-white rounded-md text-[10px] font-black tracking-wider">GET</span>
+<p class="text-sm font-bold text-emerald-700 dark:text-emerald-300">Xem trạng thái tất cả proxy</p>
+</div>
+<div class="p-5 space-y-4">
+<code class="text-xs bg-slate-900 dark:bg-slate-800 text-emerald-300 px-4 py-3 rounded-lg block font-mono break-all" id="doc-status"></code>
+<div class="text-xs text-slate-600 dark:text-slate-400">
+<p>Trả về danh sách tất cả interface PPPoE kèm IP hiện tại, trạng thái đang chạy hay không, có bị disable không.</p>
+</div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-3 mb-2">Response</p>
+<pre class="text-xs bg-slate-50 dark:bg-slate-800/50 px-4 py-3 rounded-lg font-mono border border-slate-200 dark:border-slate-700 whitespace-pre-wrap leading-relaxed">{
+  "success": true,
+  "host": "huynhty.proxydaphien.ltd",
+  "total": 3,
+  "online": 2,
+  "offline": 1,
+  "clients": [
+    {
+      "name": "pppoe-out2",
+      "ip": "42.113.213.34",
+      "running": true,
+      "disabled": false,
+      "status": "online"
+    },
+    {
+      "name": "pppoe-out3",
+      "ip": "27.72.100.15",
+      "running": true,
+      "disabled": false,
+      "status": "online"
+    },
+    {
+      "name": "pppoe-out4",
+      "ip": "",
+      "running": false,
+      "disabled": false,
+      "status": "offline"
+    }
+  ]
+}</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- Mã lỗi -->
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+<h4 class="font-bold flex items-center gap-2 mb-4"><span class="material-symbols-outlined text-red-500 text-lg">error</span> Mã lỗi thường gặp</h4>
+<table class="w-full text-xs">
+<thead><tr class="text-left font-bold text-slate-400 uppercase border-b border-slate-200 dark:border-slate-700">
+<th class="pb-2 w-40">Lỗi</th><th class="pb-2 w-28">HTTP</th><th class="pb-2">Response JSON</th>
+</tr></thead>
+<tbody class="text-slate-600 dark:text-slate-400 font-mono">
+<tr class="border-b border-slate-100 dark:border-slate-800"><td class="py-2.5 font-sans font-bold text-slate-700 dark:text-slate-300">Token không hợp lệ</td><td class="py-2.5">401</td><td class="py-2.5">{"success": false, "error": "Token không hợp lệ hoặc đã bị tắt"}</td></tr>
+<tr class="border-b border-slate-100 dark:border-slate-800"><td class="py-2.5 font-sans font-bold text-slate-700 dark:text-slate-300">Router không tìm thấy</td><td class="py-2.5">404</td><td class="py-2.5">{"success": false, "error": "Không tìm thấy router"}</td></tr>
+<tr class="border-b border-slate-100 dark:border-slate-800"><td class="py-2.5 font-sans font-bold text-slate-700 dark:text-slate-300">Interface không tồn tại</td><td class="py-2.5">404</td><td class="py-2.5">{"success": false, "error": "Interface pppoe-out99 không tồn tại"}</td></tr>
+<tr class="border-b border-slate-100 dark:border-slate-800"><td class="py-2.5 font-sans font-bold text-slate-700 dark:text-slate-300">Không kết nối được router</td><td class="py-2.5">502</td><td class="py-2.5">{"success": false, "error": "Không kết nối được MikroTik"}</td></tr>
+<tr><td class="py-2.5 font-sans font-bold text-slate-700 dark:text-slate-300">Xoay thất bại (IP trùng)</td><td class="py-2.5">200</td><td class="py-2.5">{"success": false, "message": "Không thể xoay IP mới sau 5 lần thử"}</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- Code mẫu -->
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+<h4 class="font-bold flex items-center gap-2 mb-5"><span class="material-symbols-outlined text-amber-500 text-lg">integration_instructions</span> Code mẫu tích hợp</h4>
+<div class="space-y-4">
+
+<div class="rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+<div class="bg-slate-900 px-4 py-2.5 flex items-center justify-between">
+<p class="text-xs font-bold text-slate-300 flex items-center gap-2"><span class="material-symbols-outlined text-sm text-slate-400">web</span> Trình duyệt</p>
+</div>
+<div class="p-4 bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+Copy link API → dán vào thanh địa chỉ trình duyệt → nhấn Enter → kết quả JSON hiện ngay trên trang.
+</div>
+</div>
+
+<div class="rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+<div class="bg-slate-900 px-4 py-2.5 flex items-center justify-between">
+<p class="text-xs font-bold text-slate-300 flex items-center gap-2"><span class="material-symbols-outlined text-sm text-slate-400">terminal</span> cURL</p>
+<button onclick="doCopy(this, document.getElementById('doc-curl-example').textContent)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-[10px] font-bold transition-all flex items-center gap-1"><span class="material-symbols-outlined text-xs">content_copy</span> Copy</button>
+</div>
+<div class="p-4 bg-slate-950"><pre class="text-xs font-mono text-slate-300 whitespace-pre-wrap break-all leading-relaxed" id="doc-curl-example"></pre></div>
+</div>
+
+<div class="rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+<div class="bg-slate-900 px-4 py-2.5 flex items-center justify-between">
+<p class="text-xs font-bold text-slate-300 flex items-center gap-2"><span class="material-symbols-outlined text-sm text-yellow-400">code</span> Python</p>
+<button onclick="doCopy(this, document.getElementById('code-python').textContent)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-[10px] font-bold transition-all flex items-center gap-1"><span class="material-symbols-outlined text-xs">content_copy</span> Copy</button>
+</div>
+<div class="p-4 bg-slate-950"><pre class="text-xs font-mono text-slate-300 whitespace-pre-wrap leading-relaxed" id="code-python"></pre></div>
+</div>
+
+<div class="rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+<div class="bg-slate-900 px-4 py-2.5 flex items-center justify-between">
+<p class="text-xs font-bold text-slate-300 flex items-center gap-2"><span class="material-symbols-outlined text-sm text-yellow-300">javascript</span> JavaScript</p>
+<button onclick="doCopy(this, document.getElementById('code-js').textContent)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-[10px] font-bold transition-all flex items-center gap-1"><span class="material-symbols-outlined text-xs">content_copy</span> Copy</button>
+</div>
+<div class="p-4 bg-slate-950"><pre class="text-xs font-mono text-slate-300 whitespace-pre-wrap leading-relaxed" id="code-js"></pre></div>
+</div>
+
+<div class="rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+<div class="bg-slate-900 px-4 py-2.5 flex items-center justify-between">
+<p class="text-xs font-bold text-slate-300 flex items-center gap-2"><span class="material-symbols-outlined text-sm text-cyan-400">terminal</span> PHP</p>
+<button onclick="doCopy(this, document.getElementById('code-php').textContent)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-[10px] font-bold transition-all flex items-center gap-1"><span class="material-symbols-outlined text-xs">content_copy</span> Copy</button>
+</div>
+<div class="p-4 bg-slate-950"><pre class="text-xs font-mono text-slate-300 whitespace-pre-wrap leading-relaxed" id="code-php"></pre></div>
+</div>
+
+</div>
+</div>
+
+<!-- Lưu ý -->
+<div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800 p-5">
+<h4 class="font-bold text-amber-700 dark:text-amber-300 flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-lg">warning</span> Lưu ý quan trọng</h4>
+<ul class="text-sm text-slate-700 dark:text-slate-400 space-y-2.5">
+<li class="flex items-start gap-2.5"><span class="text-amber-500 font-bold mt-0.5">1.</span> <code class="bg-amber-100 dark:bg-amber-900/40 px-1.5 py-0.5 rounded text-xs shrink-0">pppoe-out1</code> là cổng quản trị router — <strong>không được xoay</strong>, hệ thống tự bỏ qua.</li>
+<li class="flex items-start gap-2.5"><span class="text-amber-500 font-bold mt-0.5">2.</span> Mỗi token có thể dùng cho <strong>nhiều router</strong> cùng lúc. Không cần tạo token riêng cho mỗi router.</li>
+<li class="flex items-start gap-2.5"><span class="text-amber-500 font-bold mt-0.5">3.</span> Hệ thống tự retry tối đa <strong>5 lần</strong> nếu IP mới trùng IP cũ, mỗi lần chờ khoảng 3-5 giây.</li>
+<li class="flex items-start gap-2.5"><span class="text-amber-500 font-bold mt-0.5">4.</span> Token bị tắt (trạng thái <strong>Off</strong>) sẽ bị từ chối với HTTP 401. Bật lại trong tab <strong>Tokens</strong>.</li>
+<li class="flex items-start gap-2.5"><span class="text-amber-500 font-bold mt-0.5">5.</span> Mọi request đều được ghi log. Xem chi tiết trong tab <strong>Logs</strong> (thời gian, IP cũ/mới, kết quả).</li>
+<li class="flex items-start gap-2.5"><span class="text-amber-500 font-bold mt-0.5">6.</span> Nên chờ ít nhất <strong>10 giây</strong> giữa 2 lần xoay cùng 1 interface để tránh conflict.</li>
+</ul>
+</div>
+
+</div>
+</div>
+
+</div><!-- /page -->
+</main>
+</div>
+
+<script>
+const enc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function hashColor(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = str.charCodeAt(i) + ((h << 5) - h);
+  const colors = ['#3b82f6','#8b5cf6','#ec4899','#f59e0b','#10b981','#06b6d4','#ef4444','#6366f1'];
+  return colors[Math.abs(h) % colors.length];
+}
+let API = '';
+let _localRouters = [];
+let _tokens = [];
+let _mkPort = 3544;
+
+function getAPI() { return document.getElementById('api-host').value.trim().replace(/\/+$/, ''); }
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(el => {
+    el.classList.remove('bg-white','dark:bg-slate-900','text-primary','shadow-sm');
+    el.classList.add('text-slate-500');
+  });
+  document.getElementById('tab-' + tab).classList.remove('hidden');
+  const btn = document.querySelector('.tab-btn[data-tab="' + tab + '"]');
+  btn.classList.add('bg-white','dark:bg-slate-900','text-primary','shadow-sm');
+  btn.classList.remove('text-slate-500');
+}
+
+function loadRoutersFromLocalStorage() {
+  _localRouters = [];
+  const seen = new Set();
+
+  try {
+    const mrList = JSON.parse(localStorage.getItem('multi_routers') || '[]');
+    for (const r of mrList) {
+      const host = (r.host || '').trim();
+      if (host && !seen.has(host)) {
+        seen.add(host);
+        _localRouters.push({
+          name: r.note || r.identity || '',
+          host: host,
+          username: r.username || r.user || '',
+          password: r.password || r.pass || '',
+        });
+      }
+    }
+  } catch (_) {}
+
+  try {
+    const single = JSON.parse(localStorage.getItem('mk_saved') || '{}');
+    const host = (single.host || '').trim();
+    if (host && !seen.has(host)) {
+      seen.add(host);
+      _localRouters.push({
+        name: 'Router chính',
+        host: host,
+        username: single.username || single.user || '',
+        password: single.password || single.pass || '',
+      });
+    }
+  } catch (_) {}
+
+  document.getElementById('st-routers').textContent = _localRouters.length;
+  renderRouterTable();
+}
+
+function renderRouterTable() {
+  const tbody = document.getElementById('router-tbody');
+  const apiHost = API || getAPI();
+  const tk = _tokens.length > 0 ? _tokens[0].token : 'TOKEN';
+  if (_localRouters.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400 text-sm">Chưa có router. Kết nối router ở Bảng điều khiển.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = _localRouters.map((r, i) => {
+    const link = apiHost + '/api/pppoe-out2/' + r.host + '/' + tk;
+    return '<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30">' +
+    '<td class="px-6 py-3 text-sm text-slate-400">' + (i + 1) + '</td>' +
+    '<td class="px-6 py-3 text-sm font-bold">' + enc(r.name) + '</td>' +
+    '<td class="px-6 py-3 text-sm font-mono">' + enc(r.host) + '</td>' +
+    '<td class="px-6 py-3 text-sm">' + enc(r.username) + '</td>' +
+    '<td class="px-6 py-3"><div class="flex items-center gap-2">' +
+      '<code class="text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-600 px-3 py-1.5 rounded-lg font-mono cursor-pointer break-all leading-relaxed" onclick="doCopy(this,\'' + enc(link) + '\')">' + enc(link) + '</code>' +
+      '<button onclick="doCopy(this,\'' + enc(link) + '\')" class="copy-btn shrink-0 px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-bold hover:bg-primary/20 transition-all flex items-center gap-1">' +
+        '<span class="material-symbols-outlined text-sm">content_copy</span> Copy</button></div></td>' +
+    '</tr>';
+  }).join('');
+}
+
+async function testConnection() {
+  API = getAPI();
+  localStorage.setItem('api_host', API);
+  try {
+    const res = await fetch(API + '/');
+    if (res.ok) {
+      document.getElementById('conn-status').classList.remove('hidden');
+      document.getElementById('btn-test').innerHTML = '<span class="material-symbols-outlined text-lg">check</span> OK';
+      await syncRoutersToServer();
+      renderRouterTable();
+      loadTokens();
+      loadLogs();
+      updateDocs();
+    }
+  } catch (e) {
+    alert('Không kết nối được: ' + e.message);
+  }
+}
+
+async function syncRoutersToServer() {
+  if (!API || _localRouters.length === 0) return;
+  try {
+    const res = await fetch(API + '/sync-routers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        routers: _localRouters.map(r => ({
+          name: r.name, host: r.host, username: r.username, password: r.password, port: _mkPort,
+        })),
+      }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      console.log('Synced ' + data.synced + ' routers to API server (port: ' + _mkPort + ')');
+    }
+  } catch (e) {
+    console.error('Sync failed:', e);
+  }
+}
+
+async function loadTokens() {
+  if (!API) return;
+  try {
+    const res = await fetch(API + '/list-tokens');
+    _tokens = await res.json();
+    document.getElementById('st-tokens').textContent = _tokens.length;
+    renderRouterTable();
+    const tbody = document.getElementById('token-tbody');
+    if (_tokens.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400 text-sm">Chưa có token</td></tr>';
+      document.getElementById('sample-links-box').classList.add('hidden');
+      return;
+    }
+    tbody.innerHTML = _tokens.map(t => {
+      const rCount = (t.routers||[]).length;
+      return '<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30">' +
+        '<td class="px-6 py-3 text-sm font-bold">' + (enc(t.name) || '<span class="text-slate-400">—</span>') + '</td>' +
+        '<td class="px-6 py-3"><div class="flex items-center gap-2">' +
+          '<code class="text-xs bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg font-mono">' + enc(t.token) + '</code>' +
+          '<button onclick="doCopy(this,\'' + enc(t.token) + '\')" class="copy-btn shrink-0 px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-bold hover:bg-primary/10 hover:text-primary transition-all flex items-center gap-1">' +
+            '<span class="material-symbols-outlined text-sm">content_copy</span></button></div></td>' +
+        '<td class="px-6 py-3 text-xs font-bold text-slate-500">' + rCount + ' router</td>' +
+        '<td class="px-6 py-3">' + (t.is_active ? '<span class="text-xs font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-full">Active</span>' : '<span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded-full">Off</span>') + '</td>' +
+        '<td class="px-6 py-3 text-right space-x-1">' +
+          '<button onclick="showLinks(' + t.id + ')" class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold hover:bg-blue-100 transition-all">Xem Links</button>' +
+          '<button onclick="toggleToken(' + t.id + ',' + (t.is_active ? 0 : 1) + ')" class="px-3 py-1.5 bg-amber-50 text-amber-600 rounded-lg text-xs font-bold hover:bg-amber-100 transition-all">' + (t.is_active ? 'Tắt' : 'Bật') + '</button>' +
+          '<button onclick="delToken(' + t.id + ')" class="px-3 py-1.5 bg-red-50 text-red-500 rounded-lg text-xs font-bold hover:bg-red-100 transition-all">Xóa</button>' +
+        '</td></tr>';
+    }).join('');
+
+    localStorage.setItem('_api_token', _tokens[0].token);
+    showLinks(_tokens[0].id);
+  } catch (_) {}
+}
+
+function showLinks(tokenId) {
+  const t = _tokens.find(x => x.id === tokenId);
+  if (!t) return;
+  const box = document.getElementById('sample-links-box');
+  const div = document.getElementById('sample-links');
+  const apiHost = API || getAPI();
+  const routers = t.routers || [];
+  if (routers.length === 0) {
+    div.innerHTML = '<p class="text-slate-400 text-sm">Chưa có router</p>';
+    box.classList.remove('hidden');
+    return;
+  }
+  let html = '<div class="flex items-center justify-between mb-4"><h4 class="font-bold text-base">Link xoay IP — Token: <code class="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded font-mono">' + enc(t.token.substring(0,16)) + '...</code></h4>' +
+    '<button onclick="copyAllLinks(\'' + tokenId + '\')" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary/90 transition-all flex items-center gap-2 shadow-lg shadow-primary/20"><span class="material-symbols-outlined text-lg">content_copy</span> Copy tất cả</button></div>';
+
+  routers.forEach(r => {
+    const rotateLink = apiHost + '/api/pppoe-out2/' + r.host + '/' + t.token;
+    const allLink = apiHost + '/api/all/' + r.host + '/' + t.token;
+    const statusLink = apiHost + '/api/status/' + r.host + '/' + t.token;
+
+    html += '<div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 mb-3">' +
+      '<p class="text-sm font-bold mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-primary text-lg">router</span> ' + enc(r.name || r.host) + '</p>' +
+      '<div class="space-y-2">' +
+
+      '<div class="flex items-center gap-2 group">' +
+        '<span class="text-[10px] font-bold text-blue-500 w-16 shrink-0">ROTATE</span>' +
+        '<code class="text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-700 px-3 py-2 rounded-lg font-mono break-all flex-1 leading-relaxed">' + enc(rotateLink) + '</code>' +
+        '<button onclick="doCopy(this,\'' + enc(rotateLink) + '\')" class="copy-btn shrink-0 px-3 py-2 bg-blue-500 text-white rounded-lg text-xs font-bold hover:bg-blue-600 transition-all flex items-center gap-1 shadow-sm">' +
+          '<span class="material-symbols-outlined text-sm">content_copy</span> Copy</button></div>' +
+
+      '<div class="flex items-center gap-2 group">' +
+        '<span class="text-[10px] font-bold text-violet-500 w-16 shrink-0">ALL</span>' +
+        '<code class="text-xs bg-violet-50 dark:bg-violet-900/20 text-violet-700 px-3 py-2 rounded-lg font-mono break-all flex-1 leading-relaxed">' + enc(allLink) + '</code>' +
+        '<button onclick="doCopy(this,\'' + enc(allLink) + '\')" class="copy-btn shrink-0 px-3 py-2 bg-violet-500 text-white rounded-lg text-xs font-bold hover:bg-violet-600 transition-all flex items-center gap-1 shadow-sm">' +
+          '<span class="material-symbols-outlined text-sm">content_copy</span> Copy</button></div>' +
+
+      '<div class="flex items-center gap-2 group">' +
+        '<span class="text-[10px] font-bold text-emerald-500 w-16 shrink-0">STATUS</span>' +
+        '<code class="text-xs bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 px-3 py-2 rounded-lg font-mono break-all flex-1 leading-relaxed">' + enc(statusLink) + '</code>' +
+        '<button onclick="doCopy(this,\'' + enc(statusLink) + '\')" class="copy-btn shrink-0 px-3 py-2 bg-emerald-500 text-white rounded-lg text-xs font-bold hover:bg-emerald-600 transition-all flex items-center gap-1 shadow-sm">' +
+          '<span class="material-symbols-outlined text-sm">content_copy</span> Copy</button></div>' +
+
+      '</div></div>';
+  });
+  div.innerHTML = html;
+  box.classList.remove('hidden');
+}
+
+function copyAllLinks(tokenId) {
+  const t = _tokens.find(x => x.id == tokenId);
+  if (!t) return;
+  const apiHost = API || getAPI();
+  const lines = (t.routers || []).map(r =>
+    apiHost + '/api/pppoe-out2/' + r.host + '/' + t.token
+  );
+  doCopy(event.target, lines.join('\n'));
+}
+
+async function createToken() {
+  if (!API) { alert('Chưa kết nối API server'); return; }
+
+  const name = prompt('Tên token (VD: Bot Telegram):') || '';
+  try {
+    const res = await fetch(API + '/create-token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      localStorage.setItem('_api_token', data.token);
+      alert('Token đã tạo:\n\n' + data.token + '\n\nDùng cho tất cả ' + data.routers_count + ' router');
+      loadTokens();
+    } else {
+      alert('Lỗi: ' + (data.error || 'Không rõ'));
+    }
+  } catch (e) {
+    alert('Lỗi: ' + e.message);
+  }
+}
+
+async function toggleToken(id, active) {
+  if (!API) return;
+  await fetch(API + '/toggle-token/' + id, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ is_active: active }),
+  });
+  loadTokens();
+}
+
+async function delToken(id) {
+  if (!confirm('Xóa token #' + id + '?')) return;
+  await fetch(API + '/delete-token/' + id, { method: 'DELETE' });
+  loadTokens();
+}
+
+async function loadLogs() {
+  if (!API) return;
+  try {
+    const res = await fetch(API + '/logs?limit=200');
+    const data = await res.json();
+    const total = data.total || 0;
+    document.getElementById('st-requests').textContent = total;
+    const tbody = document.getElementById('log-tbody');
+    const logs = data.logs || [];
+    const success = logs.filter(l => l.success).length;
+    const failed = logs.length - success;
+    const rate = logs.length > 0 ? (success / logs.length * 100).toFixed(1) + '%' : '—';
+    document.getElementById('log-total').textContent = total;
+    document.getElementById('log-success').textContent = success;
+    document.getElementById('log-failed').textContent = failed;
+    document.getElementById('log-rate').textContent = rate;
+    if (logs.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="10" class="px-5 py-8 text-center text-slate-400 text-sm">Chưa có log</td></tr>';
+      return;
+    }
+    tbody.innerHTML = logs.map(l => {
+      const hostShort = (l.host || '').split('.')[0] || l.host || '';
+      const hostColor = hashColor(l.host || '');
+      const src = (l.source || 'api').toUpperCase();
+      const srcIsApp = src === 'APP';
+      return '<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 text-xs">' +
+      '<td class="px-4 py-2.5 text-slate-400 whitespace-nowrap">' + (l.created_at || '').replace('T', ' ').substring(0, 19) + '</td>' +
+      '<td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold ' +
+        (srcIsApp ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600' : 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600') + '">' +
+        '<span class="material-symbols-outlined text-sm">' + (srcIsApp ? 'desktop_windows' : 'api') + '</span>' + src + '</span></td>' +
+      '<td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold" style="background:' + hostColor + '15;color:' + hostColor + '">' +
+        '<span class="w-2 h-2 rounded-full" style="background:' + hostColor + '"></span>' + enc(hostShort) + '</span></td>' +
+      '<td class="px-4 py-2.5 font-mono font-bold">' + (l.interface || '—') + '</td>' +
+      '<td class="px-4 py-2.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ' +
+        (l.action === 'rotate' ? 'bg-blue-100 text-blue-600' : l.action === 'rotate-all' ? 'bg-violet-100 text-violet-600' : 'bg-slate-100 text-slate-500') + '">' + l.action + '</span></td>' +
+      '<td class="px-4 py-2.5 font-mono text-slate-400">' + (l.old_ip || '—') + '</td>' +
+      '<td class="px-4 py-2.5 font-mono font-bold text-blue-600">' + (l.new_ip || '—') + '</td>' +
+      '<td class="px-4 py-2.5">' + (l.success
+        ? '<span class="inline-flex items-center gap-1 text-emerald-600 font-bold"><span class="material-symbols-outlined text-sm">check_circle</span> OK</span>'
+        : '<span class="inline-flex items-center gap-1 text-red-500 font-bold"><span class="material-symbols-outlined text-sm">cancel</span> Fail</span>') + '</td>' +
+      '<td class="px-4 py-2.5 text-slate-400">' + ((l.elapsed_ms || 0) / 1000).toFixed(1) + 's</td>' +
+      '</tr>';
+    }).join('');
+  } catch (_) {}
+}
+
+function updateDocs() {
+  const host = API || getAPI();
+  const rHost = _localRouters.length > 0 ? _localRouters[0].host : '{router_host}';
+  const tk = _tokens.length > 0 ? _tokens[0].token : '{token}';
+  const rotateUrl = host + '/api/pppoe-out2/' + rHost + '/' + tk;
+  const allUrl = host + '/api/all/' + rHost + '/' + tk;
+  const statusUrl = host + '/api/status/' + rHost + '/' + tk;
+
+  const el = id => document.getElementById(id);
+  if (el('doc-base-url')) el('doc-base-url').textContent = host;
+  if (el('doc-rotate-one')) el('doc-rotate-one').textContent = host + '/api/pppoe-out{N}/' + rHost + '/' + tk;
+  if (el('doc-rotate-all')) el('doc-rotate-all').textContent = allUrl;
+  if (el('doc-status')) el('doc-status').textContent = statusUrl;
+  if (el('doc-curl-example')) el('doc-curl-example').textContent = 'curl "' + rotateUrl + '"';
+
+  if (el('code-python')) el('code-python').textContent =
+    'import requests\n\n' +
+    '# Xoay IP 1 proxy\n' +
+    'url = "' + rotateUrl + '"\n' +
+    'res = requests.get(url)\n' +
+    'data = res.json()\n\n' +
+    'if data["success"]:\n' +
+    '    print(f"OK: {data[\'interface\']} — {data[\'old_ip\']} → {data[\'new_ip\']}")\n' +
+    'else:\n' +
+    '    print(f"Lỗi: {data.get(\'error\') or data.get(\'message\')}")\n\n' +
+    '# Xoay tất cả proxy\n' +
+    'res_all = requests.get("' + allUrl + '")\n' +
+    'for r in res_all.json().get("results", []):\n' +
+    '    status = "OK" if r["success"] else "FAIL"\n' +
+    '    print(f"  {r[\'interface\']}: {status} — {r.get(\'new_ip\', \'\')}")';
+
+  if (el('code-js')) el('code-js').textContent =
+    '// Xoay IP 1 proxy\n' +
+    'const res = await fetch("' + rotateUrl + '");\n' +
+    'const data = await res.json();\n\n' +
+    'if (data.success) {\n' +
+    '  console.log(`OK: ${data.interface} — ${data.old_ip} → ${data.new_ip}`);\n' +
+    '} else {\n' +
+    '  console.log(`Lỗi: ${data.error || data.message}`);\n' +
+    '}\n\n' +
+    '// Xoay tất cả proxy\n' +
+    'const resAll = await fetch("' + allUrl + '");\n' +
+    'const all = await resAll.json();\n' +
+    'all.results.forEach(r => {\n' +
+    '  console.log(`  ${r.interface}: ${r.success ? r.new_ip : "FAIL"}`);\n' +
+    '});';
+
+  if (el('code-php')) el('code-php').textContent =
+    '<?php\n' +
+    '// Xoay IP 1 proxy\n' +
+    '$url = "' + rotateUrl + '";\n' +
+    '$res = json_decode(file_get_contents($url), true);\n\n' +
+    'if ($res["success"]) {\n' +
+    '    echo "OK: " . $res["interface"] . " — " . $res["old_ip"] . " → " . $res["new_ip"];\n' +
+    '} else {\n' +
+    '    echo "Lỗi: " . ($res["error"] ?? $res["message"]);\n' +
+    '}\n\n' +
+    '// Xoay tất cả proxy\n' +
+    '$all = json_decode(file_get_contents("' + allUrl + '"), true);\n' +
+    'foreach ($all["results"] as $r) {\n' +
+    '    echo $r["interface"] . ": " . ($r["success"] ? $r["new_ip"] : "FAIL") . "\\n";\n' +
+    '}\n' +
+    '?>';
+}
+
+function doCopy(el, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = el ? (el.closest ? el.closest('button') || el : el) : null;
+    if (btn) {
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<span class="material-symbols-outlined text-sm">check</span> Copied!';
+      btn.classList.add('!bg-emerald-500', '!text-white');
+      btn.style.transform = 'scale(1.05)';
+      setTimeout(() => {
+        btn.innerHTML = orig;
+        btn.classList.remove('!bg-emerald-500', '!text-white');
+        btn.style.transform = '';
+      }, 1500);
+    }
+  });
+}
+function copyText(text) { doCopy(event && event.target, text); }
+
+// Init — tự lấy API URL từ Firebase (qua backend) hoặc localStorage
+(async function init() {
+  loadRoutersFromLocalStorage();
+
+  const BACKEND = 'http://127.0.0.1:8000';
+  let apiUrl = '';
+
+  try {
+    const res = await fetch(BACKEND + '/api/admin/app-config');
+    if (res.ok) {
+      const cfg = await res.json();
+      if (cfg.api_server_url) {
+        apiUrl = cfg.api_server_url.replace(/\/+$/, '');
+      }
+      if (cfg.mikrotik_api_port) {
+        _mkPort = parseInt(cfg.mikrotik_api_port) || 3544;
+      }
+    }
+  } catch (_) {}
+
+  if (!apiUrl) {
+    apiUrl = localStorage.getItem('api_host') || '';
+  }
+
+  if (apiUrl) {
+    document.getElementById('api-host').value = apiUrl;
+    API = apiUrl;
+    localStorage.setItem('api_host', apiUrl);
+    testConnection();
+  }
+
+  updateDocs();
+})();
+(function(){try{const p=window.parent,el=document.getElementById('header-user-name');if(el&&p&&p._userName)el.textContent=p._userName;else if(el)el.textContent=localStorage.getItem('ht_user_name')||'...';}catch(_){}})();
+</script>
+</body></html>
