@@ -151,6 +151,49 @@
       <iframe id="content-frame" src="giaodien/bang_dieu_khien.html?embed=1" title="Content"></iframe>
     </main>
   </div>
+
+  <!-- Update Modal -->
+  <div id="update-modal" class="hidden fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-slate-200 dark:border-slate-700">
+      <div class="bg-gradient-to-r from-primary to-blue-600 px-6 py-4 flex items-center gap-3">
+        <span class="material-symbols-outlined text-white text-2xl">system_update</span>
+        <div>
+          <h2 class="text-white font-bold text-lg">Có bản cập nhật mới!</h2>
+          <p id="update-version" class="text-blue-100 text-sm font-medium"></p>
+        </div>
+      </div>
+      <div class="px-6 py-4">
+        <div id="update-changelog" class="text-sm text-slate-600 dark:text-slate-400 max-h-48 overflow-y-auto whitespace-pre-wrap leading-relaxed"></div>
+        <!-- Download progress section (hidden by default) -->
+        <div id="update-progress-section" class="hidden mt-4">
+          <div class="flex items-center justify-between mb-2">
+            <span id="update-progress-label" class="text-xs font-semibold text-slate-500 dark:text-slate-400">Đang tải...</span>
+            <span id="update-progress-percent" class="text-xs font-bold text-primary">0%</span>
+          </div>
+          <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 overflow-hidden">
+            <div id="update-progress-bar" class="bg-gradient-to-r from-primary to-blue-500 h-full rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+          </div>
+          <p id="update-progress-size" class="text-[10px] text-slate-400 dark:text-slate-500 mt-1 text-right"></p>
+        </div>
+        <!-- Error message -->
+        <div id="update-error" class="hidden mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <p class="text-xs text-red-600 dark:text-red-400 font-medium flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm">error</span>
+            <span id="update-error-text"></span>
+          </p>
+        </div>
+      </div>
+      <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700 flex gap-3 justify-end">
+        <button id="update-close" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">Để sau</button>
+        <button id="update-download" class="px-5 py-2 rounded-lg text-sm font-bold text-white bg-primary hover:bg-blue-700 transition-colors cursor-pointer flex items-center gap-2">
+          <span class="material-symbols-outlined text-base">download</span> Cập nhật ngay
+        </button>
+        <button id="update-install" class="hidden px-5 py-2 rounded-lg text-sm font-bold text-white bg-emerald-500 hover:bg-emerald-600 transition-colors cursor-pointer flex items-center gap-2">
+          <span class="material-symbols-outlined text-base">restart_alt</span> Cài đặt & Khởi động lại
+        </button>
+      </div>
+    </div>
+  </div>
   <script>
     const PAGES = ['bang_dieu_khien','cai_dat','lich_su_xoay_ip','gan_proxy','kiem_tra_proxy','ho_so_nguoi_dung','lien_he_ho_tro','gioi_thieu_dich_vu','huong_dan_su_dung','api','dang_nhap','dang_ky'];
     const frame = document.getElementById('content-frame');
@@ -403,6 +446,98 @@
       } catch (_) {}
     });
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+    // ─── Auto-update check ─────────────────────────────────────────────
+    (async function checkUpdate() {
+      if (!window.htUpdate) return;
+      try {
+        const result = await window.htUpdate.check();
+        if (result && result.hasUpdate) {
+          document.getElementById('update-version').textContent = 'Phiên bản ' + result.version;
+          document.getElementById('update-changelog').textContent = result.body || 'Vui lòng cập nhật để trải nghiệm tốt hơn.';
+          document.getElementById('update-modal').classList.remove('hidden');
+
+          const btnDownload = document.getElementById('update-download');
+          const btnInstall = document.getElementById('update-install');
+          const btnClose = document.getElementById('update-close');
+          const progressSection = document.getElementById('update-progress-section');
+          const progressBar = document.getElementById('update-progress-bar');
+          const progressPercent = document.getElementById('update-progress-percent');
+          const progressLabel = document.getElementById('update-progress-label');
+          const progressSize = document.getElementById('update-progress-size');
+          const errorDiv = document.getElementById('update-error');
+          const errorText = document.getElementById('update-error-text');
+
+          function formatBytes(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+          }
+
+          // Listen for download progress
+          window.htUpdate.onDownloadProgress((percent, downloaded, total) => {
+            progressBar.style.width = percent + '%';
+            progressPercent.textContent = percent + '%';
+            if (total > 0) {
+              progressSize.textContent = formatBytes(downloaded) + ' / ' + formatBytes(total);
+            }
+          });
+
+          btnDownload.onclick = async () => {
+            if (!result.assetUrl) {
+              // Fallback: open browser if no asset URL
+              window.htUpdate.openDownloadLink(result.downloadUrl);
+              return;
+            }
+
+            // Show progress, hide download button
+            btnDownload.classList.add('hidden');
+            btnClose.disabled = true;
+            btnClose.classList.add('opacity-50', 'pointer-events-none');
+            progressSection.classList.remove('hidden');
+            errorDiv.classList.add('hidden');
+            progressLabel.textContent = 'Đang tải bản cập nhật...';
+
+            try {
+              await window.htUpdate.downloadUpdate(result.assetUrl, result.assetName);
+              // Download complete
+              progressLabel.textContent = 'Tải hoàn tất!';
+              progressBar.style.width = '100%';
+              progressPercent.textContent = '100%';
+              btnInstall.classList.remove('hidden');
+              btnClose.disabled = false;
+              btnClose.classList.remove('opacity-50', 'pointer-events-none');
+            } catch (err) {
+              // Download failed
+              progressSection.classList.add('hidden');
+              errorDiv.classList.remove('hidden');
+              errorText.textContent = 'Tải thất bại: ' + (err || 'Lỗi không xác định');
+              btnDownload.classList.remove('hidden');
+              btnDownload.innerHTML = '<span class="material-symbols-outlined text-base">refresh</span> Thử lại';
+              btnClose.disabled = false;
+              btnClose.classList.remove('opacity-50', 'pointer-events-none');
+            }
+          };
+
+          btnInstall.onclick = async () => {
+            btnInstall.disabled = true;
+            btnInstall.innerHTML = '<span class="material-symbols-outlined text-base animate-spin">progress_activity</span> Đang cài đặt...';
+            try {
+              await window.htUpdate.installUpdate();
+            } catch (err) {
+              errorDiv.classList.remove('hidden');
+              errorText.textContent = 'Cài đặt thất bại: ' + (err || 'Lỗi không xác định');
+              btnInstall.disabled = false;
+              btnInstall.innerHTML = '<span class="material-symbols-outlined text-base">restart_alt</span> Cài đặt & Khởi động lại';
+            }
+          };
+
+          btnClose.onclick = () => {
+            document.getElementById('update-modal').classList.add('hidden');
+          };
+        }
+      } catch (_) {}
+    })();
   </script>
 </body>
 </html>

@@ -1,5 +1,7 @@
-const { app, BrowserWindow, screen, shell } = require('electron');
+const { app, BrowserWindow, screen, shell, ipcMain, net } = require('electron');
 const path = require('path');
+const fs = require('fs');
+const os = require('os');
 const { spawn } = require('child_process');
 
 let backendProcess = null;
@@ -65,6 +67,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js'),
     },
     icon: path.join(__dirname, 'icon.png'),
     title: 'HT Proxy - v2.6.0 Professional',
@@ -111,6 +114,167 @@ function createWindow() {
 
   return win;
 }
+
+// ─── Auto-update check via GitHub Releases ──────────────────────────────────
+function compareVersions(v1, v2) {
+  const parts1 = v1.replace(/^v/, '').split('.').map(Number);
+  const parts2 = v2.replace(/^v/, '').split('.').map(Number);
+  for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+    const a = parts1[i] || 0;
+    const b = parts2[i] || 0;
+    if (a > b) return 1;
+    if (a < b) return -1;
+  }
+  return 0;
+}
+
+ipcMain.handle('check-for-update', async () => {
+  try {
+    const { net } = require('electron');
+    const currentVersion = require('../package.json').version;
+    const data = await new Promise((resolve, reject) => {
+      const req = net.request('https://api.github.com/repos/huynhty6/appquanlyproxydaphien/releases/latest');
+      req.setHeader('User-Agent', 'HT-Proxy-Desktop');
+      req.setHeader('Authorization', 'token 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');
+      let body = '';
+      req.on('response', (res) => {
+        res.on('data', (chunk) => { body += chunk.toString(); });
+        res.on('end', () => {
+          try { resolve(JSON.parse(body)); }
+          catch (e) { reject(e); }
+        });
+      });
+      req.on('error', reject);
+      req.end();
+    });
+
+    const latestVersion = data.tag_name; // e.g. "v2.7.0"
+    if (!latestVersion) {
+      return { hasUpdate: false, error: 'No releases found' };
+    }
+    if (compareVersions(latestVersion, currentVersion) > 0) {
+      // Tìm file .exe trong assets
+      const exeAsset = (data.assets || []).find(a => a.name.endsWith('.exe'));
+      return {
+        hasUpdate: true,
+        version: latestVersion,
+        body: data.body || '',
+        downloadUrl: exeAsset ? exeAsset.browser_download_url : data.html_url,
+        assetUrl: exeAsset ? exeAsset.url : null, // API URL for authenticated download
+        assetName: exeAsset ? exeAsset.name : null,
+        assetSize: exeAsset ? exeAsset.size : 0,
+      };
+    }
+    return { hasUpdate: false };
+  } catch (err) {
+    console.error('[Update Check]', err.message);
+    return { hasUpdate: false, error: err.message };
+  }
+});
+
+ipcMain.handle('open-download-link', (event, url) => {
+  if (url && (url.startsWith('https://') || url.startsWith('http://'))) {
+    shell.openExternal(url);
+  }
+});
+
+// ─── Download update .exe from GitHub Release asset ──────────────────────────
+let downloadedInstallerPath = null;
+
+ipcMain.handle('download-update', async (event, assetUrl, assetName) => {
+  const GITHUB_TOKEN = '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';
+  const destPath = path.join(os.tmpdir(), assetName || 'HT-Proxy-Setup.exe');
+
+  return new Promise((resolve, reject) => {
+    const req = net.request(assetUrl);
+    req.setHeader('User-Agent', 'HT-Proxy-Desktop');
+    req.setHeader('Authorization', `token ${GITHUB_TOKEN}`);
+    req.setHeader('Accept', 'application/octet-stream');
+
+    req.on('response', (response) => {
+      // GitHub API redirects to S3 for asset download
+      if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location) {
+        const redirectUrl = Array.isArray(response.headers.location)
+          ? response.headers.location[0]
+          : response.headers.location;
+        // Follow redirect without auth header
+        const req2 = net.request(redirectUrl);
+        req2.setHeader('User-Agent', 'HT-Proxy-Desktop');
+        req2.on('response', (res2) => {
+          handleDownloadResponse(res2, destPath, event.sender, resolve, reject);
+        });
+        req2.on('error', (err) => reject(err.message));
+        req2.end();
+        return;
+      }
+      handleDownloadResponse(response, destPath, event.sender, resolve, reject);
+    });
+
+    req.on('error', (err) => reject(err.message));
+    req.end();
+  });
+});
+
+function handleDownloadResponse(response, destPath, sender, resolve, reject) {
+  if (response.statusCode !== 200) {
+    let errorBody = '';
+    response.on('data', (chunk) => { errorBody += chunk.toString(); });
+    response.on('end', () => reject(`HTTP ${response.statusCode}: ${errorBody.substring(0, 200)}`));
+    return;
+  }
+
+  const contentLength = parseInt(
+    (Array.isArray(response.headers['content-length'])
+      ? response.headers['content-length'][0]
+      : response.headers['content-length']) || '0',
+    10
+  );
+
+  const fileStream = fs.createWriteStream(destPath);
+  let downloaded = 0;
+
+  response.on('data', (chunk) => {
+    fileStream.write(chunk);
+    downloaded += chunk.length;
+    if (contentLength > 0) {
+      const percent = Math.round((downloaded / contentLength) * 100);
+      try { sender.send('download-progress', percent, downloaded, contentLength); } catch (_) {}
+    }
+  });
+
+  response.on('end', () => {
+    fileStream.end(() => {
+      downloadedInstallerPath = destPath;
+      resolve({ success: true, path: destPath });
+    });
+  });
+
+  response.on('error', (err) => {
+    fileStream.end();
+    try { fs.unlinkSync(destPath); } catch (_) {}
+    reject(err.message);
+  });
+}
+
+// ─── Install update: run NSIS installer silently and quit ────────────────────
+ipcMain.handle('install-update', async () => {
+  if (!downloadedInstallerPath || !fs.existsSync(downloadedInstallerPath)) {
+    return { success: false, error: 'Installer not found' };
+  }
+
+  // Spawn NSIS installer with /S (silent) flag, detached so it survives app quit
+  spawn(downloadedInstallerPath, ['/S'], {
+    detached: true,
+    stdio: 'ignore',
+  }).unref();
+
+  // Give installer a moment to start, then quit
+  setTimeout(() => {
+    app.quit();
+  }, 500);
+
+  return { success: true };
+});
 
 // ─── App lifecycle ────────────────────────────────────────────────────────────
 app.whenReady().then(async () => {
